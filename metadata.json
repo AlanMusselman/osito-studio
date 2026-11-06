@@ -1,0 +1,5 @@
+{
+  "name": "Osito (Pixel + Vector Editor)",
+  "description": "A pixel-perfect hybrid bitmap and vector web design editor featuring Pointer/Subselection/Magic Wand tools, 1px auto-snap grids, live JavaScript-programmable AutoShapes, CSS/Tailwind/React code generation, and dockable panel groups.",
+  "requestFramePermissions": []
+}

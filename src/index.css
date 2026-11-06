@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    user-select: none;
+    border-radius: 0px !important;
+  }
+
+  input, textarea, pre, code {
+    user-select: text;
+    border-radius: 0px !important;
+  }
+}
+
+/* Monochrome Greyscale Architectural Scrollbars — Zero Rounded Corners */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0c0c0c;
+}
+::-webkit-scrollbar-thumb {
+  background: #2e2e2e;
+  border-radius: 0px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #4a4a4a;
+}
+
+/* Crisp Pixel Rendering when zoomed in */
+.pixelated-canvas {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
