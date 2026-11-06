@@ -240,7 +240,7 @@ export const App: React.FC = () => {
   const settingsMenuRef = useRef<HTMLDivElement | null>(null);
   const presetMenuRef = useRef<HTMLDivElement | null>(null);
 
-  // Fireworks MX Clipboard & Temporary Spacebar Hand-Pan State
+  // Osito Clipboard & Temporary Spacebar Hand-Pan State
   const clipboardObjectsRef = useRef<CanvasObject[]>([]);
   const clipboardSliceRef = useRef<CanvasSlice | null>(null);
   const pasteCascadeStepRef = useRef<number>(0);
@@ -1260,7 +1260,7 @@ export const App: React.FC = () => {
     [objects, recordHistorySnapshot, showToast]
   );
 
-  // Fireworks MX Clipboard & Cloning Engine (Ctrl+C Copy, Ctrl+X Cut, Ctrl+V Paste in Place, Ctrl+Shift+V Paste Offset Above)
+  // Osito Clipboard & Cloning Engine (Ctrl+C Copy, Ctrl+X Cut, Ctrl+V Paste in Place, Ctrl+Shift+V Paste Offset Above)
   const cloneObjectsWithRemappedIds = useCallback(
     (sourceObjects: CanvasObject[], dx: number, dy: number, suffix: string): CanvasObject[] => {
       const stamp = Date.now();
@@ -1560,7 +1560,7 @@ export const App: React.FC = () => {
     ]
   );
 
-  // Fireworks MX "Edit > Clone" (Ctrl+Shift+D / ⌘+⇧+D) — Clones selected objects in place (0,0 offset) on top
+  // Osito "Edit > Clone" (Ctrl+Shift+D / ⌘+⇧+D) — Clones selected objects in place (0,0 offset) on top
   const handleCloneSelectedInPlace = useCallback(() => {
     const selectedList = objects.filter((o) => selectedIds.includes(o.id));
     if (selectedList.length === 0) {
@@ -1576,7 +1576,7 @@ export const App: React.FC = () => {
     );
   }, [objects, selectedIds, recordHistorySnapshot, cloneObjectsWithRemappedIds, showToast]);
 
-  // Fireworks MX "Edit > Duplicate" (Ctrl+Alt+D / ⌘+⌥+D) — Duplicates selected objects offset (+16px, +16px) on top
+  // Osito "Edit > Duplicate" (Ctrl+Alt+D / ⌘+⌥+D) — Duplicates selected objects offset (+16px, +16px) on top
   const handleDuplicateSelectedOffset = useCallback(() => {
     const selectedList = objects.filter((o) => selectedIds.includes(o.id));
     if (selectedList.length === 0) {
@@ -2328,7 +2328,7 @@ export const App: React.FC = () => {
       panX: 0,
       panY: 0,
     }));
-    showToast('Loaded Showcase 1/6: Flagship Fireworks MX Hybrid Lab');
+    showToast('Loaded Showcase 1/6: Flagship Osito Hybrid Lab');
   }, [closeAllTopMenus, recordHistorySnapshot, showToast]);
 
   const handleLoadShowcasePreset = useCallback(
@@ -2391,7 +2391,7 @@ export const App: React.FC = () => {
       {
         idx: 0,
         badge: 'SCENE 1/6 • HYBRID VECTOR + BITMAP LAB',
-        title: 'Flagship Fireworks MX Hybrid Studio',
+        title: 'Flagship Osito Hybrid Studio',
         detail:
           'Simultaneous Cubic Bezier paths (A), 1px Bitmap Marquee Cut/Paste (M), and 125+ programmable .JSF AutoShapes (◆) on one unified canvas.',
       },
@@ -3096,8 +3096,8 @@ export const App: React.FC = () => {
     [selectedObjects]
   );
 
-  // Complete Macromedia Fireworks MX Cross-Platform Keyboard Shortcuts Catalog (Windows & macOS)
-  const fireworksShortcutsList: ShortcutItem[] = React.useMemo(
+  // Complete Osito Studio Cross-Platform Keyboard Shortcuts Catalog (Windows & macOS)
+  const ositoShortcutsList: ShortcutItem[] = React.useMemo(
     () => [
       // 0. Omnibar & Deep Research
       {
@@ -3163,7 +3163,7 @@ export const App: React.FC = () => {
         id: 'paste-in-place',
         category: 'Clipboard & Cloning',
         label: 'Paste in Place (On Top)',
-        description: 'Fireworks MX signature: pastes copied bitmap pixels or object(s) as a new layer at exact X,Y coordinates on top',
+        description: 'Osito signature: pastes copied bitmap pixels or object(s) as a new layer at exact X,Y coordinates on top',
         winKeys: ['Ctrl', 'V'],
         macKeys: ['⌘', 'V'],
         action: () => handlePasteSelection('in-place'),
@@ -3316,7 +3316,7 @@ export const App: React.FC = () => {
         id: 'flatten-selection',
         category: 'Select, Path & Pixels',
         label: 'Flatten Selection to Bitmap',
-        description: 'Fireworks MX Modify > Flatten Selection: rasterize vector/AutoShape to pixels',
+        description: 'Modify > Flatten Selection: rasterize vector/AutoShape to pixels',
         winKeys: ['Ctrl', 'Alt', 'Shift', 'Z'],
         macKeys: ['⌘', '⌥', '⇧', 'Z'],
         action: () => {
@@ -3332,7 +3332,7 @@ export const App: React.FC = () => {
         macKeys: ['Arrows', '⇧+Arrows'],
       },
 
-      // 4. Tools (Single Key — Classic Fireworks MX)
+      // 4. Tools (Single Key)
       {
         id: 'tool-pointer',
         category: 'Tools (Single Key)',
@@ -3382,7 +3382,7 @@ export const App: React.FC = () => {
         id: 'tool-connector',
         category: 'Tools (Single Key)',
         label: 'Smart Connector Tool',
-        description: 'Draw auto-routing Lucidchart/Fireworks connectors between N/E/S/W ports',
+        description: 'Draw auto-routing Lucidchart/Osito connectors between N/E/S/W ports',
         winKeys: ['X'],
         macKeys: ['X'],
         action: () => handleSelectTool('connector'),
@@ -3552,7 +3552,7 @@ export const App: React.FC = () => {
       {
         id: 'zoom-presets',
         category: 'View, Zoom & Grids',
-        label: 'Fireworks Magnification Presets (50%–800%)',
+        label: 'Osito Magnification Presets (50%–800%)',
         description: 'Ctrl+1 (100%), Ctrl+2 (200%), Ctrl+3 (300%), Ctrl+4 (400%), Ctrl+5 (50%), Ctrl+8 (800%)',
         winKeys: ['Ctrl+1..8'],
         macKeys: ['⌘+1..8'],
@@ -3626,7 +3626,7 @@ export const App: React.FC = () => {
     ]
   );
 
-  // Global Macromedia Fireworks MX Keyboard Shortcuts Engine (Windows Ctrl/Alt & macOS ⌘/⌥)
+  // Global Osito Studio Keyboard Shortcuts Engine (Windows Ctrl/Alt & macOS ⌘/⌥)
   useEffect(() => {
     const ZOOM_STEPS = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4, 6, 8, 12, 16];
 
@@ -4113,7 +4113,7 @@ export const App: React.FC = () => {
           return;
         }
 
-        // 19. Fireworks MX Magnification Presets: Ctrl+1 (100%), Ctrl+2 (200%), Ctrl+3 (300%), Ctrl+4 (400%), Ctrl+5 (50%), Ctrl+8 (800%)
+        // 19. Osito Magnification Presets: Ctrl+1 (100%), Ctrl+2 (200%), Ctrl+3 (300%), Ctrl+4 (400%), Ctrl+5 (50%), Ctrl+8 (800%)
         const zoomPresetMap: Record<string, number> = {
           Digit1: 1,
           Digit2: 2,
@@ -4186,10 +4186,10 @@ export const App: React.FC = () => {
       }
 
       // =====================================================================
-      // SINGLE-KEY FIREWORKS MX TOOL & COLOR SHORTCUTS
+      // SINGLE-KEY OSITO STUDIO TOOL & COLOR SHORTCUTS
       // =====================================================================
       if (!isCmdOrCtrl && !e.altKey) {
-        // '?' (Shift + /) opens the Fireworks MX Keyboard Shortcuts Modal
+        // '?' (Shift + /) opens the Osito Studio Keyboard Shortcuts Modal
         if (e.key === '?') {
           e.preventDefault();
           setIsShortcutsModalOpen((prev) => !prev);
@@ -4207,7 +4207,7 @@ export const App: React.FC = () => {
           return;
         }
 
-        // Shift + X: Swap Fill & Stroke Colors (Classic Fireworks MX)
+        // Shift + X: Swap Fill & Stroke Colors
         if (k === 'x' && e.shiftKey) {
           e.preventDefault();
           setToolOptions((prev) => {
@@ -4237,7 +4237,7 @@ export const App: React.FC = () => {
           return;
         }
 
-        // D: Reset Fill & Stroke to Default Swatches (Classic Fireworks MX)
+        // D: Reset Fill & Stroke to Default Swatches
         if (k === 'd' && !e.shiftKey) {
           setToolOptions((prev) => ({
             ...prev,
@@ -4295,7 +4295,7 @@ export const App: React.FC = () => {
         else if (k === 'q') handleSelectTool('scale');
         else if (k === 'c') handleSelectTool('crop');
         else if (k === 'm') {
-          // Cycle Rectangular Marquee <-> Oval Marquee like Fireworks MX
+          // Cycle Rectangular Marquee <-> Oval Marquee
           handleSelectTool(activeTool === 'marquee-rect' ? 'marquee-oval' : 'marquee-rect');
         } else if (k === 'l') handleSelectTool('lasso');
         else if (k === 'w') handleSelectTool('magic-wand');
@@ -4307,7 +4307,7 @@ export const App: React.FC = () => {
         else if (k === 'n') handleSelectTool('line');
         else if (k === 'p') handleSelectTool('pen');
         else if (k === 'u') {
-          // Cycle Rectangle -> Ellipse -> AutoShape like Fireworks MX
+          // Cycle Rectangle -> Ellipse -> AutoShape
           const nextShapeTool: ToolId =
             activeTool === 'rect'
               ? 'ellipse'
@@ -4992,7 +4992,7 @@ export const App: React.FC = () => {
                   </div>
                   <div className="space-y-0.5">
                     {[
-                      { idx: 0, label: '1. Fireworks MX Hybrid Lab', tag: 'Default' },
+                      { idx: 0, label: '1. Osito Hybrid Lab', tag: 'Default' },
                       { idx: 1, label: '2. Security Drone Website', tag: 'Nested Nav' },
                       { idx: 2, label: '3. Apple Bento Hardware Grid', tag: 'Bento UI' },
                       { idx: 3, label: '4. Executive AI Strategy Board', tag: 'War-Room' },
@@ -5886,11 +5886,11 @@ export const App: React.FC = () => {
         uxGrade={canvasAuditReport.grade}
       />
 
-      {/* Macromedia Fireworks MX Keyboard Shortcuts Reference Modal (Windows & macOS) */}
+      {/* Osito Studio Keyboard Shortcuts Reference Modal (Windows & macOS) */}
       <ShortcutsModal
         isOpen={isShortcutsModalOpen}
         onClose={() => setIsShortcutsModalOpen(false)}
-        shortcuts={fireworksShortcutsList}
+        shortcuts={ositoShortcutsList}
       />
 
       {/* Interactive Self-Running Demo Tour HUD Banner */}

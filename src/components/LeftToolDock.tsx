@@ -535,7 +535,7 @@ export const LeftToolDock: React.FC<LeftToolDockProps> = ({
           )}
         </div>
 
-        {/* WEB SECTION (Fireworks MX Web Layer & Slice Tools) */}
+        {/* WEB SECTION (Osito Web Layer & Slice Tools) */}
         <div className="border-t border-[#242424] pt-2">
           <div className="text-[9px] font-mono uppercase tracking-wider text-[#a3a3a3] px-0.5 mb-1 flex items-center justify-between">
             <span>Web</span>

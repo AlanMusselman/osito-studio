@@ -7,7 +7,7 @@ const rootDir = path.resolve(__dirname, '..');
 const distDir = path.join(rootDir, 'dist');
 const assetsDir = path.join(distDir, 'assets');
 const indexPath = path.join(distDir, 'index.html');
-const standaloneOutPath = path.join(distDir, 'Osito_Fireworks_Studio_Standalone.html');
+const standaloneOutPath = path.join(distDir, 'Osito_Studio_Standalone.html');
 
 if (!fs.existsSync(indexPath)) {
   console.error('dist/index.html not found. Run vite build first.');
@@ -40,4 +40,4 @@ if (jsFile) {
 
 fs.writeFileSync(standaloneOutPath, html, 'utf8');
 const sizeKb = (fs.statSync(standaloneOutPath).size / 1024).toFixed(1);
-console.log(`✓ Generated zero-server single-file studio: dist/Osito_Fireworks_Studio_Standalone.html (${sizeKb} kB)`);
+console.log(`✓ Generated zero-server single-file studio: dist/Osito_Studio_Standalone.html (${sizeKb} kB)`);

@@ -116,7 +116,7 @@ export function createBlankBitmapDataUrl(
 }
 
 /**
- * Generates a crisp, colorful Macromedia Fireworks MX / Evolve UI pixel-art &
+ * Generates a crisp, colorful Osito Studio pixel-art &
  * color-zone test card so the user can immediately test Magic Wand (W),
  * Marquee (M), Lasso (L), Eraser (E), Paint Bucket (G), and Floating Pixel drag!
  */
@@ -381,7 +381,7 @@ export function buildCssFilterString(filters: LiveBitmapFilters): string {
 }
 
 // ============================================================================
-// 2. FIREWORKS MX PIXEL SELECTION CONSTRUCTORS & BOOLEAN MASK ENGINE
+// 2. OSITO PIXEL SELECTION CONSTRUCTORS & BOOLEAN MASK ENGINE
 // ============================================================================
 
 /**
@@ -1188,7 +1188,7 @@ export function extractSelectionOutlines(
 }
 
 // ============================================================================
-// 4. PIXEL EDITING & FLOATING SELECTION OPERATIONS (FIREWORKS MX WORKFLOW)
+// 4. PIXEL EDITING & FLOATING SELECTION OPERATIONS (OSITO WORKFLOW)
 // ============================================================================
 
 /**
@@ -1861,7 +1861,7 @@ export async function extractOrCutSelectedBitmapPixels(
 }
 
 /**
- * Classic Fireworks MX behavior when dragging inside an active Marquee/Magic Wand
+ * Classic Osito Studio behavior when dragging inside an active Marquee/Magic Wand
  * selection with the Pointer (`V`) or Marquee (`M`) tool:
  * Extracts the selected pixels into `selection.floatingPixels` and (unless
  * `cloneOnly` is true for Alt+Drag cloning) erases those pixels from `bitmap`!

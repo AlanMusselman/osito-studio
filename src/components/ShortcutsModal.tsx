@@ -79,7 +79,7 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({
             </div>
             <div>
               <div className="text-sm font-bold text-white tracking-wide uppercase">
-                Fireworks MX &amp; Osito Studio Keyboard Shortcuts (Windows &amp; macOS)
+                Osito Studio 4.0 Keyboard Shortcuts (Windows &amp; macOS)
               </div>
               <div className="text-[11px] text-[#a3a3a3]">
                 Ctrl+K Omnibar &amp; Deep Research · Ctrl+C Copy · Ctrl+V Paste in Place · Ctrl+Shift+V Paste Offset Above · All Classic Tools

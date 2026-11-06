@@ -3174,7 +3174,7 @@ export function auditCanvasDesignReadiness(
     },
     {
       id: 'pixel-hygiene',
-      label: '1px Fireworks Snap Hygiene',
+      label: '1px Osito Snap Hygiene',
       score: snapScore,
       maxScore: 15,
       status: snapScore >= 14 ? 'optimal' : snapScore >= 10 ? 'warning' : 'action-needed',

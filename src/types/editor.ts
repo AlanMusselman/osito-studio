@@ -1,11 +1,11 @@
 export type ToolId =
-  // Fireworks MX Select Section
+  // Osito Select Section
   | 'pointer'        // V / 0: Black Arrow - Object select, move, bounding transform, float pixels
   | 'subselect'      // A / 1: White Hollow Arrow - Vector Bezier node & handle editor, AutoShape diamond control
   | 'select-behind'  // V (variant): Click through overlapping Z-order layers
   | 'scale'          // Q: Free Transform / 8-handle scale & rotate
   | 'crop'           // C: Canvas crop & export slice
-  // Fireworks MX Bitmap Section
+  // Osito Bitmap Section
   | 'marquee-rect'   // M: Rectangular pixel selection (marching ants)
   | 'marquee-oval'   // M (oval): Elliptical pixel selection
   | 'lasso'          // L: Freehand pixel lasso selection
@@ -15,7 +15,7 @@ export type ToolId =
   | 'eraser'         // E: Raster pixel eraser
   | 'bucket'         // G: Raster flood-fill paint bucket
   | 'eyedropper'     // I: Pixel color picker
-  // Fireworks MX Vector Section
+  // Osito Vector Section
   | 'line'           // N: Pixel-snapped vector line
   | 'connector'      // X / J: Lucidchart-style Smart Auto-Connecting Line (Elbow / Curved / Straight)
   | 'pen'            // P: Cubic Bezier vector path pen tool
@@ -23,7 +23,7 @@ export type ToolId =
   | 'ellipse'        // O: Vector ellipse
   | 'text'           // T: Crisp UI typography tool
   | 'autoshape'      // JS Programmable AutoShape placement tool
-  // Fireworks MX Web Section
+  // Osito Web Section
   | 'slice'          // K: Web Slice Tool - Draw, select, move & resize Retina export slices
   // View Section
   | 'hand'           // H / Space: Pan canvas
@@ -109,7 +109,7 @@ export interface BaseCanvasObject {
   stroke: string;
   strokeWidth: number;
   strokeAlign: 'center' | 'inside' | 'outside';
-  /** Fireworks MX signature pixel-snap alignment (rounds coordinates & offsets odd strokes by +0.5px) */
+  /** Osito signature pixel-snap alignment (rounds coordinates & offsets odd strokes by +0.5px) */
   pixelSnap: boolean;
   shadow: LiveShadowFilter;
   /** Interactive Component State variants (Default / :hover / :active / Dark Mode) */
@@ -176,7 +176,7 @@ export type CanvasObject =
   | TextObject;
 
 /**
- * Yellow Diamond Control Point on a Fireworks MX AutoShape
+ * Yellow Diamond Control Point on an Osito AutoShape
  */
 export interface AutoShapeControlPoint {
   id: string;
@@ -221,7 +221,7 @@ export const AUTOSHAPE_GROUP_ORDER: AutoShapeCategory[] = [
 ];
 
 /**
- * Programmable JavaScript AutoShape Definition (Fireworks .jsf style)
+ * Programmable JavaScript AutoShape Definition (.jsf style)
  */
 export interface AutoShapeDefinition {
   id: string;
@@ -298,7 +298,7 @@ export interface GridAndSnapSettings {
   showMajorGrid: boolean;     // Shows layout grid (e.g. 8px or 16px)
   gridSize: number;           // Default 8 or 16
   snapToGrid: boolean;        // Snap coordinates to gridSize
-  snapToPixel: boolean;       // Strict 1px integer coordinate snapping (Fireworks MX mode)
+  snapToPixel: boolean;       // Strict 1px integer coordinate snapping (Osito mode)
   snapToObjects: boolean;     // Smart alignment guides against other objects
   showRulers: boolean;
   showSlices?: boolean;       // Show Web Slice overlays on canvas

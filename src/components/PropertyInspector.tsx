@@ -97,7 +97,7 @@ export interface PropertyInspectorProps {
   onShowToast?: (msg: string) => void;
 }
 
-export type FireworksLiveEffectPresetId =
+export type OsitoLiveEffectPresetId =
   | 'neon-cyber-glow'
   | 'tactile-glassmorphism'
   | 'web20-gel-button'
@@ -105,8 +105,8 @@ export type FireworksLiveEffectPresetId =
   | 'gold-foil-badge'
   | 'clear-effects';
 
-const FIREWORKS_LIVE_EFFECT_PRESETS: Array<{
-  id: FireworksLiveEffectPresetId;
+const OSITO_LIVE_EFFECT_PRESETS: Array<{
+  id: OsitoLiveEffectPresetId;
   label: string;
   title: string;
   accentClass: string;
@@ -126,7 +126,7 @@ const FIREWORKS_LIVE_EFFECT_PRESETS: Array<{
   {
     id: 'web20-gel-button',
     label: '● Web 2.0 Gel',
-    title: 'Retro Web 2.0 Gel Button — Classic Macromedia Fireworks MX Aqua gloss gradient & sapphire shadow',
+    title: 'Retro Web 2.0 Gel Button — Classic Aqua gloss gradient & sapphire shadow',
     accentClass: 'border-sky-400/50 text-sky-200 hover:bg-sky-400/20',
   },
   {
@@ -472,7 +472,7 @@ export const PropertyInspector: React.FC<PropertyInspectorProps> = ({
 
   const applyLiveEffectPresetToSingleObject = (
     obj: CanvasObject,
-    presetId: FireworksLiveEffectPresetId,
+    presetId: OsitoLiveEffectPresetId,
     recordHistory = true
   ) => {
     const isText = obj.type === 'text';
@@ -729,18 +729,18 @@ export const PropertyInspector: React.FC<PropertyInspectorProps> = ({
 
   const handleApplyLiveEffectPreset = (
     targets: CanvasObject[],
-    presetId: FireworksLiveEffectPresetId
+    presetId: OsitoLiveEffectPresetId
   ) => {
     if (targets.length === 0) return;
     onRecordHistorySnapshot?.();
     targets.forEach((obj) => {
       applyLiveEffectPresetToSingleObject(obj, presetId, false);
     });
-    const presetMeta = FIREWORKS_LIVE_EFFECT_PRESETS.find((p) => p.id === presetId);
+    const presetMeta = OSITO_LIVE_EFFECT_PRESETS.find((p) => p.id === presetId);
     onShowToast?.(
       presetId === 'clear-effects'
         ? `Cleared Live Effects on ${targets.length} selected layer${targets.length > 1 ? 's' : ''}`
-        : `Applied Fireworks MX "${presetMeta?.label || presetId}" Live Filter to ${
+        : `Applied Osito "${presetMeta?.label || presetId}" Live Filter to ${
             targets.length
           } layer${targets.length > 1 ? 's' : ''}!`
     );
@@ -806,19 +806,19 @@ export const PropertyInspector: React.FC<PropertyInspectorProps> = ({
     return (
       <div className="flex items-center gap-1">
         <div className="h-4 w-[1px] bg-[#2e2e2e] mx-0.5" />
-        {/* Compact Fireworks MX "+Live FX" Preset Dropdown */}
+        {/* Compact Osito "+Live FX" Preset Dropdown */}
         <select
           value=""
           onChange={(e) => {
-            const val = e.target.value as FireworksLiveEffectPresetId;
+            const val = e.target.value as OsitoLiveEffectPresetId;
             if (!val) return;
             handleApplyLiveEffectPreset(targets, val);
           }}
-          title="Apply 1-Click Fireworks MX Live Effect Preset"
+          title="Apply 1-Click Osito Live Effect Preset"
           className="bg-[#181818] hover:bg-[#242424] border border-[#383838] rounded-none px-1.5 py-0.5 text-[10px] font-mono text-[#d4d4d4] hover:text-white outline-none cursor-pointer"
         >
           <option value="">+ Live FX...</option>
-          {FIREWORKS_LIVE_EFFECT_PRESETS.map((preset) => (
+          {OSITO_LIVE_EFFECT_PRESETS.map((preset) => (
             <option key={preset.id} value={preset.id}>
               {preset.label}
             </option>

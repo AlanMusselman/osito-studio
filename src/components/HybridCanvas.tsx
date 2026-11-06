@@ -295,7 +295,7 @@ export function renderCanvasObjectToContext(
     ctx.translate(ox, oy);
   }
 
-  // Fireworks MX Live Drop Shadow
+  // Osito Live Drop Shadow
   if (obj.shadow?.enabled) {
     ctx.shadowColor = obj.shadow.color || 'rgba(0,0,0,0.5)';
     ctx.shadowBlur = obj.shadow.blur ?? 8;
@@ -343,7 +343,7 @@ export function renderCanvasObjectToContext(
     return true;
   };
 
-  // Fireworks MX Pixel-Perfect Stroke Helper (handles Inside / Center / Outside + 0.5px odd stroke snapping)
+  // Osito Pixel-Perfect Stroke Helper (handles Inside / Center / Outside + 0.5px odd stroke snapping)
   const fillAndStrokeCurrentPath = (isClosed: boolean, retracePath?: () => void) => {
     if (applyFillStyle()) {
       ctx.fill();
@@ -2786,7 +2786,7 @@ export const HybridCanvas: React.FC<HybridCanvasProps> = ({
       return;
     }
 
-    // Fireworks MX Handle Scaling: Shift = Constrained Proportional Aspect Ratio | No Shift = Free Skew/Stretch
+    // Osito Handle Scaling: Shift = Constrained Proportional Aspect Ratio | No Shift = Free Skew/Stretch
     if (drag.mode === 'resize-object' && drag.targetObjectId && drag.initialObjectsMap && drag.handle) {
       const initObj = drag.initialObjectsMap.get(drag.targetObjectId);
       if (!initObj) return;
@@ -4096,7 +4096,7 @@ export const HybridCanvas: React.FC<HybridCanvasProps> = ({
       });
     }
 
-    // 5. Render Monochrome Fireworks MX Overlays: Selection Handles, Bezier Nodes, AutoShape Diamonds (Hidden in Preview Mode)
+    // 5. Render Monochrome Osito Overlays: Selection Handles, Bezier Nodes, AutoShape Diamonds (Hidden in Preview Mode)
     if (!isPreviewMode) {
       selectedIds.forEach((id) => {
         const obj = objects.find((o) => o.id === id);

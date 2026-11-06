@@ -38,7 +38,7 @@ export interface PublishModalProps {
   uxGrade?: string;
 }
 
-const EXECUTIVE_SHARE_SUMMARY = `✦ Osito Studio 4.0 (Macromedia Fireworks MX × AI Design Engine)
+const EXECUTIVE_SHARE_SUMMARY = `✦ Osito Studio 4.0 (Hybrid Pixel + Vector + Web + AI Design Engine)
 A pixel-perfect hybrid bitmap, cubic Bezier vector, and programmable JavaScript AutoShape studio:
 • Hybrid Canvas Engine: Edit raster bitmaps (Marquee, Magic Wand, 1px Pixel Pencil), Cubic Bezier vector nodes (Subselect tool), and UI typography in one unified Z-ordered layer stack with automatic 1px pixel-center stroke snapping.
 • 125+ Programmable JS AutoShapes (.JSF Engine): Drag yellow diamond (◆) on-canvas control handles to morph stars, gears, rotary gauges, isometric cubes, and interactive UI components—or edit their live JS code in the built-in Code Studio.
@@ -46,7 +46,7 @@ A pixel-perfect hybrid bitmap, cubic Bezier vector, and programmable JavaScript 
 • AI Strategy & Creative Generators: 1-Click Deep Research & Competitive Strategy War-Room, 6-Variation Vector Logo Studio, Full Website Layout Generator, and WCAG 2.2 Auto-Polish Engine.
 • Multi-Scale Retina Exporter: Batch-export @1x/@2x/@3x WebP, AVIF, PNG & SVG slices into a production .ZIP archive or standalone interactive HTML showcase.`;
 
-const MASTER_AI_STUDIO_BUILD_PROMPT = `Build "Osito Studio 4.0 (Pixel + Vector Editor)", a professional web-based hybrid bitmap & vector graphic design application inspired by Macromedia Fireworks MX with programmable JavaScript Smart Shapes.
+const MASTER_AI_STUDIO_BUILD_PROMPT = `Build "Osito Studio 4.0 (Pixel + Vector Editor)", a professional web-based hybrid bitmap & vector graphic design application with programmable JavaScript Smart Shapes.
 
 Core Architecture & Features Required:
 1. Unified Hybrid Canvas Engine (HTML5 Canvas + SVG Overlay):
@@ -70,7 +70,7 @@ Core Architecture & Features Required:
 const SHOWCASE_PRESET_CARDS = [
   {
     index: 0,
-    title: '1. Flagship Fireworks MX Hybrid Lab',
+    title: '1. Flagship Osito Hybrid Lab',
     badge: 'DEFAULT LAB',
     desc: 'Bitmap Marquee/Magic Wand card + Cubic Bezier wave + ◆ JS AutoShapes + Magnetic Connectors + Nested Navbar.',
   },
@@ -132,9 +132,8 @@ export const PublishModal: React.FC<PublishModalProps> = ({
 
   if (!isOpen) return null;
 
-  const standaloneFilePath =
-    'C:\\Users\\Alan Musselman\\OneDrive\\Documents\\personalai\\evolve-fireworks-studio\\dist\\Osito_Fireworks_Studio_Standalone.html';
-  const githubRepoUrl = 'https://github.com/AlanMusselman/osito-fireworks-studio';
+  const standaloneFilePath = 'dist/Osito_Studio_Standalone.html';
+  const githubRepoUrl = 'https://github.com/AlanMusselman/osito-studio';
 
   const handleCopyPrompt = async () => {
     try {
@@ -567,7 +566,7 @@ export const PublishModal: React.FC<PublishModalProps> = ({
                         rel="noreferrer"
                         className="text-cyan-300 font-mono underline hover:text-white"
                       >
-                        AlanMusselman/osito-fireworks-studio
+                        AlanMusselman/osito-studio
                       </a>{' '}
                       (contains <code className="font-mono">metadata.json</code>,{' '}
                       <code className="font-mono">package.json</code>, and{' '}
@@ -771,7 +770,7 @@ export const PublishModal: React.FC<PublishModalProps> = ({
 
         {/* Modal Footer */}
         <div className="px-5 py-3 bg-[#0a0a0a] border-t border-[#2e2e2e] flex items-center justify-between text-[11px] text-[#a3a3a3] rounded-none">
-          <span>Osito Studio 4.0 · Macromedia Fireworks MX Hybrid Vector + Pixel + JS AutoShape Engine</span>
+          <span>Osito Studio 4.0 · Hybrid Vector + Pixel + JS AutoShape Engine</span>
           <button
             type="button"
             onClick={onClose}

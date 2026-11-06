@@ -230,7 +230,7 @@ export function createAutoShapeHelpers(): AutoShapeHelpers {
 }
 
 /**
- * 16 Built-In Fireworks MX Programmable Smart AutoShapes (.jsf style)
+ * 16 Built-In Osito Programmable Smart AutoShapes (.jsf style)
  */
 export const DEFAULT_AUTOSHAPES: AutoShapeDefinition[] = [
   // 1. Smart Rounded / Chamfered Rectangle
@@ -239,7 +239,7 @@ export const DEFAULT_AUTOSHAPES: AutoShapeDefinition[] = [
     name: 'Smart Rounded Rectangle',
     category: 'Creative & Vector',
     description:
-      'Fireworks MX signature Smart Rectangle with live yellow diamond corner radius handle and chamfer toggle.',
+      'Osito signature Smart Rectangle with live yellow diamond corner radius handle and chamfer toggle.',
     iconName: 'RectangleHorizontal',
     isBuiltIn: true,
     paramSchema: [
@@ -3289,7 +3289,7 @@ export function convertAutoShapeToVectorPath(
  * Tier-1 Deterministic Procedural JS AutoShape Generator ($0.00 offline fallback)
  * Matches natural-language prompts (shield, badge, lightning, bolt, cross, plus, heart,
  * diamond, chevron, cylinder, resistor, circuit, bracket, ribbon, banner, polygon, hexagon)
- * and synthesizes complete, runnable Fireworks MX `.jsf` AutoShape definitions with yellow diamond handles.
+ * and synthesizes complete, runnable Osito `.jsf` AutoShape definitions with yellow diamond handles.
  */
 export function generateProceduralAutoShapeFromPrompt(prompt: string): AutoShapeDefinition {
   const q = prompt.trim().toLowerCase();
