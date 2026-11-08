@@ -4,7 +4,7 @@ import type { AutoShapeDefinition } from '../types/editor';
  * 50 Built-In Sitemap, Information Architecture, Wireframe Page & Cloud/System Flow AutoShapes (.jsf)
  * Every AutoShape is parametric (1-3 yellow diamond handles) and Preview-Mode interactive (`onPreviewClick`).
  */
-export const SITEMAP_AND_FLOW_AUTOSHAPES: AutoShapeDefinition[] = [
+const RAW_SITEMAP_AND_FLOW_AUTOSHAPES: AutoShapeDefinition[] = [
   // 1. Sitemap Root / Home Page Wireframe Node
   {
     id: 'sitemap-root-home',
@@ -3206,5 +3206,1246 @@ function buildPaths(width, height, params, helpers) {
   return paths;
 }`,
   },
+
+  // 51. Flowchart: Start / End Terminator Pill (ISO-5807)
+  {
+    id: 'flow-terminator-pill',
+    name: 'Flowchart: Start / End Terminator',
+    category: 'Flow & Diagrams',
+    description: 'Standard ISO-5807 rounded stadium/pill terminator node for marking Start, End, Trigger, or Return points in a flowchart.',
+    iconName: 'PlayCircle',
+    isBuiltIn: true,
+    previewInteractive: true,
+    previewHint: 'Click in Preview Mode to toggle double-border End State ring',
+    paramSchema: [
+      { key: 'label', label: 'Centered Node Text', type: 'string', defaultValue: 'Start / End' },
+      { key: 'capRatio', label: 'Capsule Roundness', type: 'number', min: 0.2, max: 0.5, step: 0.01, defaultValue: 0.5 },
+      { key: 'doubleBorder', label: 'Double End-State Ring', type: 'boolean', defaultValue: false },
+    ],
+    defaultParams: { label: 'Start / End', capRatio: 0.5, doubleBorder: false },
+    jsSourceCode: `// Flowchart: Start / End Terminator (.jsf)
+function getControlPoints(width, height, params, helpers) {
+  const cr = helpers.clamp(Number(params.capRatio) || 0.5, 0.2, 0.5);
+  return [
+    { id: 'capRatio', label: \`Round: \${Math.round(cr * 200)}%\`, x: Math.min(width, height) * cr, y: 0, cursor: 'ew-resize' }
+  ];
+}
+
+function onDragControlPoint(id, localX, localY, width, height, params, helpers) {
+  if (id === 'capRatio') {
+    const cr = helpers.clamp(localX / Math.max(1, Math.min(width, height)), 0.2, 0.5);
+    return { ...params, capRatio: Number(cr.toFixed(2)) };
+  }
+  return params;
+}
+
+function onPreviewClick(localX, localY, width, height, params) {
+  return { ...params, doubleBorder: !params.doubleBorder };
+}
+
+function buildPaths(width, height, params, helpers) {
+  const cr = helpers.clamp(Number(params.capRatio) || 0.5, 0.2, 0.5);
+  const r = Math.min(width, height) * cr;
+  const paths = [{ nodes: helpers.rectPath(0, 0, width, height, r), closed: true }];
+  if (params.doubleBorder) {
+    const inset = Math.max(4, Math.min(width, height) * 0.08);
+    paths.push({
+      nodes: helpers.rectPath(inset, inset, width - inset * 2, height - inset * 2, Math.max(2, r - inset)),
+      closed: true
+    });
+  }
+  return paths;
+}`,
+  },
+
+  // 52. Flowchart: Process / Action Step Box (ISO-5807)
+  {
+    id: 'flow-process-step',
+    name: 'Flowchart: Process / Action Box',
+    category: 'Flow & Diagrams',
+    description: 'Standard flowchart process step rectangle with adjustable corner radius and optional top accent header strip.',
+    iconName: 'Square',
+    isBuiltIn: true,
+    previewInteractive: true,
+    previewHint: 'Click in Preview Mode to toggle top status accent band',
+    paramSchema: [
+      { key: 'label', label: 'Centered Node Text', type: 'string', defaultValue: 'Process Step' },
+      { key: 'cornerRadius', label: 'Corner Radius (px)', type: 'number', min: 0, max: 28, step: 1, defaultValue: 6 },
+      { key: 'showHeaderBand', label: 'Show Top Accent Strip', type: 'boolean', defaultValue: false },
+    ],
+    defaultParams: { label: 'Process Step', cornerRadius: 6, showHeaderBand: false },
+    jsSourceCode: `// Flowchart: Process / Action Box (.jsf)
+function getControlPoints(width, height, params, helpers) {
+  const r = helpers.clamp(Number(params.cornerRadius) ?? 6, 0, 28);
+  return [
+    { id: 'cornerRadius', label: \`Radius: \${Math.round(r)}px\`, x: r, y: 0, cursor: 'ew-resize' }
+  ];
+}
+
+function onDragControlPoint(id, localX, localY, width, height, params, helpers) {
+  if (id === 'cornerRadius') {
+    return { ...params, cornerRadius: Math.round(helpers.clamp(localX, 0, 28)) };
+  }
+  return params;
+}
+
+function onPreviewClick(localX, localY, width, height, params) {
+  return { ...params, showHeaderBand: !params.showHeaderBand };
+}
+
+function buildPaths(width, height, params, helpers) {
+  const r = helpers.clamp(Number(params.cornerRadius) ?? 6, 0, 28);
+  const paths = [{ nodes: helpers.rectPath(0, 0, width, height, r), closed: true }];
+  if (params.showHeaderBand) {
+    const hy = Math.max(12, height * 0.22);
+    paths.push({ nodes: helpers.polygonPath([{ x: 0, y: hy }, { x: width, y: hy }], false), closed: false });
+  }
+  return paths;
+}`,
+  },
+
+  // 53. Flowchart: Decision Diamond (Yes / No Branch)
+  {
+    id: 'flow-decision-diamond',
+    name: 'Flowchart: Decision Diamond',
+    category: 'Flow & Diagrams',
+    description: 'Classic ISO-5807 4-way conditional branching diamond for Yes/No or True/False decisions.',
+    iconName: 'Diamond',
+    isBuiltIn: true,
+    previewInteractive: true,
+    previewHint: 'Click in Preview Mode to toggle inner double-diamond highlight',
+    paramSchema: [
+      { key: 'label', label: 'Centered Node Text', type: 'string', defaultValue: 'Decision?' },
+      { key: 'innerInset', label: 'Inner Frame Ratio', type: 'number', min: 0, max: 0.22, step: 0.01, defaultValue: 0 },
+    ],
+    defaultParams: { label: 'Decision?', innerInset: 0 },
+    jsSourceCode: `// Flowchart: Decision Diamond (.jsf)
+function getControlPoints(width, height, params, helpers) {
+  const ins = helpers.clamp(Number(params.innerInset) || 0, 0, 0.22);
+  return [
+    { id: 'innerInset', label: ins > 0.02 ? \`Inner: \${Math.round(ins * 100)}%\` : 'Single Diamond', x: width * 0.5, y: height * ins, cursor: 'ns-resize' }
+  ];
+}
+
+function onDragControlPoint(id, localX, localY, width, height, params, helpers) {
+  if (id === 'innerInset') {
+    return { ...params, innerInset: Number(helpers.clamp(localY / Math.max(1, height), 0, 0.22).toFixed(2)) };
+  }
+  return params;
+}
+
+function onPreviewClick(localX, localY, width, height, params) {
+  const cur = Number(params.innerInset) || 0;
+  return { ...params, innerInset: cur > 0.04 ? 0 : 0.1 };
+}
+
+function buildPaths(width, height, params, helpers) {
+  const ins = helpers.clamp(Number(params.innerInset) || 0, 0, 0.22);
+  const cx = width / 2;
+  const cy = height / 2;
+  const paths = [
+    {
+      nodes: helpers.polygonPath([
+        { x: cx, y: 0 },
+        { x: width, y: cy },
+        { x: cx, y: height },
+        { x: 0, y: cy }
+      ]),
+      closed: true
+    }
+  ];
+  if (ins > 0.02) {
+    const ix = width * ins;
+    const iy = height * ins;
+    paths.push({
+      nodes: helpers.polygonPath([
+        { x: cx, y: iy },
+        { x: width - ix, y: cy },
+        { x: cx, y: height - iy },
+        { x: ix, y: cy }
+      ]),
+      closed: true
+    });
+  }
+  return paths;
+}`,
+  },
+
+  // 54. Flowchart: Data Input / Output Parallelogram
+  {
+    id: 'flow-data-io',
+    name: 'Flowchart: Data Input / Output (I/O)',
+    category: 'Flow & Diagrams',
+    description: 'Slanted ISO-5807 parallelogram representing Data Input, Output, Payload Read, or API Response.',
+    iconName: 'Sliders',
+    isBuiltIn: true,
+    previewInteractive: true,
+    previewHint: 'Click in Preview Mode to flip slant direction',
+    paramSchema: [
+      { key: 'label', label: 'Centered Node Text', type: 'string', defaultValue: 'Input / Output' },
+      { key: 'slantRatio', label: 'Parallelogram Skew', type: 'number', min: 0.08, max: 0.32, step: 0.01, defaultValue: 0.18 },
+      { key: 'flipSlant', label: 'Reverse Skew Direction', type: 'boolean', defaultValue: false },
+    ],
+    defaultParams: { label: 'Input / Output', slantRatio: 0.18, flipSlant: false },
+    jsSourceCode: `// Flowchart: Data Input / Output Parallelogram (.jsf)
+function getControlPoints(width, height, params, helpers) {
+  const sr = helpers.clamp(Number(params.slantRatio) || 0.18, 0.08, 0.32);
+  return [
+    { id: 'slantRatio', label: \`Skew: \${Math.round(sr * 100)}%\`, x: width * sr, y: 0, cursor: 'ew-resize' }
+  ];
+}
+
+function onDragControlPoint(id, localX, localY, width, height, params, helpers) {
+  if (id === 'slantRatio') {
+    return { ...params, slantRatio: Number(helpers.clamp(localX / Math.max(1, width), 0.08, 0.32).toFixed(2)) };
+  }
+  return params;
+}
+
+function onPreviewClick(localX, localY, width, height, params) {
+  return { ...params, flipSlant: !params.flipSlant };
+}
+
+function buildPaths(width, height, params, helpers) {
+  const sx = helpers.clamp(Number(params.slantRatio) || 0.18, 0.08, 0.32) * width;
+  const flip = Boolean(params.flipSlant);
+  const pts = flip
+    ? [{ x: 0, y: 0 }, { x: width - sx, y: 0 }, { x: width, y: height }, { x: sx, y: height }]
+    : [{ x: sx, y: 0 }, { x: width, y: 0 }, { x: width - sx, y: height }, { x: 0, y: height }];
+  return [{ nodes: helpers.polygonPath(pts), closed: true }];
+}`,
+  },
+
+  // 55. Flowchart: Predefined Process / Subroutine
+  {
+    id: 'flow-subroutine-predefined',
+    name: 'Flowchart: Predefined Subroutine',
+    category: 'Flow & Diagrams',
+    description: 'ISO-5807 Predefined Process / Subroutine block with adjustable left and right vertical inner margin bars.',
+    iconName: 'Columns',
+    isBuiltIn: true,
+    previewInteractive: true,
+    previewHint: 'Click in Preview Mode to cycle side bar inset width',
+    paramSchema: [
+      { key: 'label', label: 'Centered Node Text', type: 'string', defaultValue: 'Subroutine()' },
+      { key: 'sideBarRatio', label: 'Side Bar Inset Ratio', type: 'number', min: 0.08, max: 0.25, step: 0.01, defaultValue: 0.14 },
+    ],
+    defaultParams: { label: 'Subroutine()', sideBarRatio: 0.14 },
+    jsSourceCode: `// Flowchart: Predefined Subroutine (.jsf)
+function getControlPoints(width, height, params, helpers) {
+  const sb = helpers.clamp(Number(params.sideBarRatio) || 0.14, 0.08, 0.25);
+  return [
+    { id: 'sideBarRatio', label: \`Inset: \${Math.round(sb * 100)}%\`, x: width * sb, y: height * 0.5, cursor: 'ew-resize' }
+  ];
+}
+
+function onDragControlPoint(id, localX, localY, width, height, params, helpers) {
+  if (id === 'sideBarRatio') {
+    return { ...params, sideBarRatio: Number(helpers.clamp(localX / Math.max(1, width), 0.08, 0.25).toFixed(2)) };
+  }
+  return params;
+}
+
+function onPreviewClick(localX, localY, width, height, params) {
+  const cur = Number(params.sideBarRatio) || 0.14;
+  return { ...params, sideBarRatio: cur > 0.16 ? 0.1 : 0.2 };
+}
+
+function buildPaths(width, height, params, helpers) {
+  const sb = helpers.clamp(Number(params.sideBarRatio) || 0.14, 0.08, 0.25) * width;
+  return [
+    { nodes: helpers.rectPath(0, 0, width, height, 4), closed: true },
+    { nodes: helpers.polygonPath([{ x: sb, y: 0 }, { x: sb, y: height }], false), closed: false },
+    { nodes: helpers.polygonPath([{ x: width - sb, y: 0 }, { x: width - sb, y: height }], false), closed: false }
+  ];
+}`,
+  },
+
+  // 56. Flowchart: Document / Multi-Document Wave Symbol
+  {
+    id: 'flow-document-wave',
+    name: 'Flowchart: Document / Multi-Doc',
+    category: 'Flow & Diagrams',
+    description: 'Standard flowchart Document / Report output node with cubic Bezier S-wave bottom edge and 1-3 stacked document sheets.',
+    iconName: 'FileText',
+    isBuiltIn: true,
+    previewInteractive: true,
+    previewHint: 'Click in Preview Mode to cycle between Single Document and Multi-Document (1-3 sheets)',
+    paramSchema: [
+      { key: 'label', label: 'Centered Node Text', type: 'string', defaultValue: 'Document / Report' },
+      { key: 'waveDepth', label: 'Bottom Wave Amplitude', type: 'number', min: 0.06, max: 0.24, step: 0.01, defaultValue: 0.13 },
+      { key: 'sheets', label: 'Document Sheets', type: 'number', min: 1, max: 3, step: 1, defaultValue: 1 },
+    ],
+    defaultParams: { label: 'Document / Report', waveDepth: 0.13, sheets: 1 },
+    jsSourceCode: `// Flowchart: Document / Multi-Doc (.jsf)
+function getControlPoints(width, height, params, helpers) {
+  const wd = helpers.clamp(Number(params.waveDepth) || 0.13, 0.06, 0.24);
+  const sh = Math.round(helpers.clamp(Number(params.sheets) || 1, 1, 3));
+  return [
+    { id: 'waveDepth', label: \`Wave: \${Math.round(wd * 100)}%\`, x: width * 0.25, y: height * (1 - wd), cursor: 'ns-resize' },
+    { id: 'sheets', label: \`Sheets: \${sh}\`, x: helpers.lerp(width * 0.3, width * 0.7, (sh - 1) / 2), y: 8, cursor: 'ew-resize' }
+  ];
+}
+
+function onDragControlPoint(id, localX, localY, width, height, params, helpers) {
+  if (id === 'waveDepth') {
+    const wd = helpers.clamp(1 - localY / Math.max(1, height), 0.06, 0.24);
+    return { ...params, waveDepth: Number(wd.toFixed(2)) };
+  }
+  if (id === 'sheets') {
+    const t = helpers.clamp((localX - width * 0.3) / (width * 0.4), 0, 1);
+    return { ...params, sheets: Math.round(1 + t * 2) };
+  }
+  return params;
+}
+
+function onPreviewClick(localX, localY, width, height, params) {
+  const next = (Math.round(Number(params.sheets) || 1) % 3) + 1;
+  return { ...params, sheets: next };
+}
+
+function buildPaths(width, height, params, helpers) {
+  const wd = helpers.clamp(Number(params.waveDepth) || 0.13, 0.06, 0.24) * height;
+  const sh = Math.round(helpers.clamp(Number(params.sheets) || 1, 1, 3));
+  const off = sh > 1 ? 7 : 0;
+  const cw = width - off * (sh - 1);
+  const ch = height - off * (sh - 1);
+  const paths = [];
+
+  for (let i = sh - 1; i >= 0; i--) {
+    const ox = i * off;
+    const oy = (sh - 1 - i) * off;
+    const baseY = oy + ch - wd;
+    paths.push({
+      nodes: [
+        helpers.cornerNode(ox, oy),
+        helpers.cornerNode(ox + cw, oy),
+        helpers.cornerNode(ox + cw, baseY),
+        helpers.smoothNode(ox + cw * 0.5, baseY, ox + cw * 0.75, baseY - wd * 1.35, ox + cw * 0.25, baseY + wd * 1.35),
+        helpers.cornerNode(ox, baseY)
+      ],
+      closed: true
+    });
+  }
+  return paths;
+}`,
+  },
+
+  // 57. Flowchart: Manual Input (Slanted Top Quadrilateral)
+  {
+    id: 'flow-manual-input',
+    name: 'Flowchart: Manual User Input',
+    category: 'Flow & Diagrams',
+    description: 'ISO-5807 Manual Input node with sloped top edge representing user form entry, CLI prompt, or manual parameter input.',
+    iconName: 'Keyboard',
+    isBuiltIn: true,
+    previewInteractive: true,
+    previewHint: 'Click in Preview Mode to adjust top slope depth',
+    paramSchema: [
+      { key: 'label', label: 'Centered Node Text', type: 'string', defaultValue: 'Manual Input' },
+      { key: 'slopeRatio', label: 'Top Slope Drop Ratio', type: 'number', min: 0.12, max: 0.42, step: 0.01, defaultValue: 0.26 },
+    ],
+    defaultParams: { label: 'Manual Input', slopeRatio: 0.26 },
+    jsSourceCode: `// Flowchart: Manual User Input (.jsf)
+function getControlPoints(width, height, params, helpers) {
+  const sr = helpers.clamp(Number(params.slopeRatio) || 0.26, 0.12, 0.42);
+  return [
+    { id: 'slopeRatio', label: \`Slope: \${Math.round(sr * 100)}%\`, x: 0, y: height * sr, cursor: 'ns-resize' }
+  ];
+}
+
+function onDragControlPoint(id, localX, localY, width, height, params, helpers) {
+  if (id === 'slopeRatio') {
+    return { ...params, slopeRatio: Number(helpers.clamp(localY / Math.max(1, height), 0.12, 0.42).toFixed(2)) };
+  }
+  return params;
+}
+
+function onPreviewClick(localX, localY, width, height, params) {
+  const cur = Number(params.slopeRatio) || 0.26;
+  return { ...params, slopeRatio: cur > 0.28 ? 0.18 : 0.34 };
+}
+
+function buildPaths(width, height, params, helpers) {
+  const sy = helpers.clamp(Number(params.slopeRatio) || 0.26, 0.12, 0.42) * height;
+  return [
+    {
+      nodes: helpers.polygonPath([
+        { x: 0, y: sy },
+        { x: width, y: 0 },
+        { x: width, y: height },
+        { x: 0, y: height }
+      ]),
+      closed: true
+    }
+  ];
+}`,
+  },
+
+  // 58. Flowchart: Manual Operation (Inverted Trapezoid)
+  {
+    id: 'flow-manual-operation',
+    name: 'Flowchart: Manual Operation',
+    category: 'Flow & Diagrams',
+    description: 'ISO-5807 Manual Operation trapezoid representing a human-in-the-loop review, manual approval, or physical step.',
+    iconName: 'Hand',
+    isBuiltIn: true,
+    previewInteractive: true,
+    previewHint: 'Click in Preview Mode to invert trapezoid orientation',
+    paramSchema: [
+      { key: 'label', label: 'Centered Node Text', type: 'string', defaultValue: 'Manual Review' },
+      { key: 'taperRatio', label: 'Bottom Taper Inset', type: 'number', min: 0.08, max: 0.32, step: 0.01, defaultValue: 0.18 },
+      { key: 'invert', label: 'Invert Trapezoid', type: 'boolean', defaultValue: false },
+    ],
+    defaultParams: { label: 'Manual Review', taperRatio: 0.18, invert: false },
+    jsSourceCode: `// Flowchart: Manual Operation (.jsf)
+function getControlPoints(width, height, params, helpers) {
+  const tr = helpers.clamp(Number(params.taperRatio) || 0.18, 0.08, 0.32);
+  return [
+    { id: 'taperRatio', label: \`Taper: \${Math.round(tr * 100)}%\`, x: width * tr, y: height, cursor: 'ew-resize' }
+  ];
+}
+
+function onDragControlPoint(id, localX, localY, width, height, params, helpers) {
+  if (id === 'taperRatio') {
+    return { ...params, taperRatio: Number(helpers.clamp(localX / Math.max(1, width), 0.08, 0.32).toFixed(2)) };
+  }
+  return params;
+}
+
+function onPreviewClick(localX, localY, width, height, params) {
+  return { ...params, invert: !params.invert };
+}
+
+function buildPaths(width, height, params, helpers) {
+  const tx = helpers.clamp(Number(params.taperRatio) || 0.18, 0.08, 0.32) * width;
+  const inv = Boolean(params.invert);
+  const pts = inv
+    ? [{ x: tx, y: 0 }, { x: width - tx, y: 0 }, { x: width, y: height }, { x: 0, y: height }]
+    : [{ x: 0, y: 0 }, { x: width, y: 0 }, { x: width - tx, y: height }, { x: tx, y: height }];
+  return [{ nodes: helpers.polygonPath(pts), closed: true }];
+}`,
+  },
+
+  // 59. Flowchart: Preparation / Initialization Hexagon
+  {
+    id: 'flow-preparation-hex',
+    name: 'Flowchart: Preparation Hexagon',
+    category: 'Flow & Diagrams',
+    description: 'ISO-5807 6-sided Preparation / Setup node for initializing variables, configuring state, or setting up loop counters.',
+    iconName: 'Hexagon',
+    isBuiltIn: true,
+    previewInteractive: true,
+    previewHint: 'Click in Preview Mode to toggle side point depth',
+    paramSchema: [
+      { key: 'label', label: 'Centered Node Text', type: 'string', defaultValue: 'Initialize / Setup' },
+      { key: 'pointRatio', label: 'Side Point Depth', type: 'number', min: 0.1, max: 0.36, step: 0.01, defaultValue: 0.2 },
+    ],
+    defaultParams: { label: 'Initialize / Setup', pointRatio: 0.2 },
+    jsSourceCode: `// Flowchart: Preparation Hexagon (.jsf)
+function getControlPoints(width, height, params, helpers) {
+  const pr = helpers.clamp(Number(params.pointRatio) || 0.2, 0.1, 0.36);
+  return [
+    { id: 'pointRatio', label: \`Tip: \${Math.round(pr * 100)}%\`, x: width * pr, y: 0, cursor: 'ew-resize' }
+  ];
+}
+
+function onDragControlPoint(id, localX, localY, width, height, params, helpers) {
+  if (id === 'pointRatio') {
+    return { ...params, pointRatio: Number(helpers.clamp(localX / Math.max(1, width), 0.1, 0.36).toFixed(2)) };
+  }
+  return params;
+}
+
+function onPreviewClick(localX, localY, width, height, params) {
+  const cur = Number(params.pointRatio) || 0.2;
+  return { ...params, pointRatio: cur > 0.22 ? 0.14 : 0.28 };
+}
+
+function buildPaths(width, height, params, helpers) {
+  const px = helpers.clamp(Number(params.pointRatio) || 0.2, 0.1, 0.36) * width;
+  const cy = height / 2;
+  return [
+    {
+      nodes: helpers.polygonPath([
+        { x: px, y: 0 },
+        { x: width - px, y: 0 },
+        { x: width, y: cy },
+        { x: width - px, y: height },
+        { x: px, y: height },
+        { x: 0, y: cy }
+      ]),
+      closed: true
+    }
+  ];
+}`,
+  },
+
+  // 60. Flowchart: Delay / Wait Gate (D-Shape Bullet)
+  {
+    id: 'flow-delay-wait',
+    name: 'Flowchart: Delay / Wait Gate',
+    category: 'Flow & Diagrams',
+    description: 'ISO-5807 D-shaped Delay node representing a timer wait, rate limit backoff, or scheduled hold.',
+    iconName: 'Clock',
+    isBuiltIn: true,
+    previewInteractive: true,
+    previewHint: 'Click in Preview Mode to toggle inner clock hands indicator',
+    paramSchema: [
+      { key: 'label', label: 'Centered Node Text', type: 'string', defaultValue: 'Delay / Wait' },
+      { key: 'curveRatio', label: 'Right Nose Curve Ratio', type: 'number', min: 0.25, max: 0.65, step: 0.01, defaultValue: 0.44 },
+      { key: 'showClock', label: 'Show Timer Emblem', type: 'boolean', defaultValue: false },
+    ],
+    defaultParams: { label: 'Delay / Wait', curveRatio: 0.44, showClock: false },
+    jsSourceCode: `// Flowchart: Delay / Wait Gate (.jsf)
+function getControlPoints(width, height, params, helpers) {
+  const cr = helpers.clamp(Number(params.curveRatio) || 0.44, 0.25, 0.65);
+  return [
+    { id: 'curveRatio', label: \`Arch: \${Math.round(cr * 100)}%\`, x: width * (1 - cr), y: 0, cursor: 'ew-resize' }
+  ];
+}
+
+function onDragControlPoint(id, localX, localY, width, height, params, helpers) {
+  if (id === 'curveRatio') {
+    const cr = helpers.clamp(1 - localX / Math.max(1, width), 0.25, 0.65);
+    return { ...params, curveRatio: Number(cr.toFixed(2)) };
+  }
+  return params;
+}
+
+function onPreviewClick(localX, localY, width, height, params) {
+  return { ...params, showClock: !params.showClock };
+}
+
+function buildPaths(width, height, params, helpers) {
+  const cr = helpers.clamp(Number(params.curveRatio) || 0.44, 0.25, 0.65);
+  const splitX = width * (1 - cr);
+  const rx = width - splitX;
+  const ry = height / 2;
+  const k = 0.5522847498;
+  const paths = [
+    {
+      nodes: [
+        helpers.cornerNode(0, 0),
+        helpers.smoothNode(splitX, 0, splitX, 0, splitX + rx * k, 0),
+        helpers.smoothNode(width, ry, width, ry - ry * k, width, ry + ry * k),
+        helpers.smoothNode(splitX, height, splitX + rx * k, height, splitX, height),
+        helpers.cornerNode(0, height)
+      ],
+      closed: true
+    }
+  ];
+  if (params.showClock) {
+    const r = Math.min(width, height) * 0.16;
+    const cx = width * 0.22;
+    const cy = height * 0.5;
+    paths.push({ nodes: helpers.ellipsePath(cx, cy, r, r), closed: true });
+    paths.push({ nodes: helpers.polygonPath([{ x: cx, y: cy - r * 0.6 }, { x: cx, y: cy }, { x: cx + r * 0.5, y: cy }], false), closed: false });
+  }
+  return paths;
+}`,
+  },
+
+  // 61. Flowchart: Internal Storage / RAM Memory Block
+  {
+    id: 'flow-internal-storage',
+    name: 'Flowchart: Internal Storage (RAM)',
+    category: 'Flow & Diagrams',
+    description: 'ISO-5807 Internal Storage symbol with intersecting top and left memory address header lines.',
+    iconName: 'HardDrive',
+    isBuiltIn: true,
+    previewInteractive: true,
+    previewHint: 'Click in Preview Mode to toggle memory partition offset',
+    paramSchema: [
+      { key: 'label', label: 'Centered Node Text', type: 'string', defaultValue: 'Internal Storage' },
+      { key: 'offsetRatio', label: 'Header Grid Offset', type: 'number', min: 0.12, max: 0.34, step: 0.01, defaultValue: 0.2 },
+    ],
+    defaultParams: { label: 'Internal Storage', offsetRatio: 0.2 },
+    jsSourceCode: `// Flowchart: Internal Storage (.jsf)
+function getControlPoints(width, height, params, helpers) {
+  const or = helpers.clamp(Number(params.offsetRatio) || 0.2, 0.12, 0.34);
+  return [
+    { id: 'offsetRatio', label: \`Grid: \${Math.round(or * 100)}%\`, x: width * or, y: height * or, cursor: 'nwse-resize' }
+  ];
+}
+
+function onDragControlPoint(id, localX, localY, width, height, params, helpers) {
+  if (id === 'offsetRatio') {
+    const or = helpers.clamp(((localX / Math.max(1, width)) + (localY / Math.max(1, height))) / 2, 0.12, 0.34);
+    return { ...params, offsetRatio: Number(or.toFixed(2)) };
+  }
+  return params;
+}
+
+function onPreviewClick(localX, localY, width, height, params) {
+  const cur = Number(params.offsetRatio) || 0.2;
+  return { ...params, offsetRatio: cur > 0.22 ? 0.15 : 0.26 };
+}
+
+function buildPaths(width, height, params, helpers) {
+  const or = helpers.clamp(Number(params.offsetRatio) || 0.2, 0.12, 0.34);
+  const ox = width * or;
+  const oy = height * or;
+  return [
+    { nodes: helpers.rectPath(0, 0, width, height, 3), closed: true },
+    { nodes: helpers.polygonPath([{ x: ox, y: 0 }, { x: ox, y: height }], false), closed: false },
+    { nodes: helpers.polygonPath([{ x: 0, y: oy }, { x: width, y: oy }], false), closed: false }
+  ];
+}`,
+  },
+
+  // 62. Flowchart: Sequential Access / Audit Log Tape
+  {
+    id: 'flow-sequential-tape',
+    name: 'Flowchart: Sequential Log / Tape',
+    category: 'Flow & Diagrams',
+    description: 'ISO-5807 Sequential Access Storage symbol (circle with bottom horizontal tangent tail) for event logs and streams.',
+    iconName: 'Disc',
+    isBuiltIn: true,
+    previewInteractive: true,
+    previewHint: 'Click in Preview Mode to toggle inner spool core ring',
+    paramSchema: [
+      { key: 'label', label: 'Centered Node Text', type: 'string', defaultValue: 'Sequential Log' },
+      { key: 'innerSpool', label: 'Inner Spool Ratio', type: 'number', min: 0, max: 0.45, step: 0.02, defaultValue: 0.24 },
+    ],
+    defaultParams: { label: 'Sequential Log', innerSpool: 0.24 },
+    jsSourceCode: `// Flowchart: Sequential Log / Tape (.jsf)
+function getControlPoints(width, height, params, helpers) {
+  const sp = helpers.clamp(Number(params.innerSpool) ?? 0.24, 0, 0.45);
+  return [
+    { id: 'innerSpool', label: \`Spool: \${Math.round(sp * 100)}%\`, x: width * (0.5 + sp * 0.4), y: height * 0.5, cursor: 'ew-resize' }
+  ];
+}
+
+function onDragControlPoint(id, localX, localY, width, height, params, helpers) {
+  if (id === 'innerSpool') {
+    const sp = helpers.clamp((Math.abs(localX - width * 0.5) * 2.2) / Math.max(1, width), 0, 0.45);
+    return { ...params, innerSpool: Number(sp.toFixed(2)) };
+  }
+  return params;
+}
+
+function onPreviewClick(localX, localY, width, height, params) {
+  const cur = Number(params.innerSpool) ?? 0.24;
+  return { ...params, innerSpool: cur > 0.1 ? 0 : 0.26 };
+}
+
+function buildPaths(width, height, params, helpers) {
+  const sp = helpers.clamp(Number(params.innerSpool) ?? 0.24, 0, 0.45);
+  const r = Math.min(width, height) * 0.46;
+  const cx = width * 0.48;
+  const cy = height * 0.5;
+  const paths = [
+    { nodes: helpers.ellipsePath(cx, cy, r, r), closed: true },
+    { nodes: helpers.polygonPath([{ x: cx, y: cy + r }, { x: width, y: cy + r }], false), closed: false }
+  ];
+  if (sp > 0.04) {
+    paths.push({ nodes: helpers.ellipsePath(cx, cy, r * sp, r * sp), closed: true });
+  }
+  return paths;
+}`,
+  },
+
+  // 63. Flowchart: Direct Access Disk Drum (Horizontal Cylinder)
+  {
+    id: 'flow-direct-storage-drum',
+    name: 'Flowchart: Direct Access Disk Drum',
+    category: 'Flow & Diagrams',
+    description: 'ISO-5807 horizontal magnetic disk drum symbol for high-speed direct-access data storage.',
+    iconName: 'Database',
+    isBuiltIn: true,
+    previewInteractive: true,
+    previewHint: 'Click in Preview Mode to cycle drum end-cap depth',
+    paramSchema: [
+      { key: 'label', label: 'Centered Node Text', type: 'string', defaultValue: 'Direct Disk' },
+      { key: 'capRatio', label: 'Right Cap Depth Ratio', type: 'number', min: 0.12, max: 0.34, step: 0.01, defaultValue: 0.2 },
+    ],
+    defaultParams: { label: 'Direct Disk', capRatio: 0.2 },
+    jsSourceCode: `// Flowchart: Direct Access Disk Drum (.jsf)
+function getControlPoints(width, height, params, helpers) {
+  const cr = helpers.clamp(Number(params.capRatio) || 0.2, 0.12, 0.34);
+  return [
+    { id: 'capRatio', label: \`Cap: \${Math.round(cr * 100)}%\`, x: width * (1 - cr * 2), y: height * 0.5, cursor: 'ew-resize' }
+  ];
+}
+
+function onDragControlPoint(id, localX, localY, width, height, params, helpers) {
+  if (id === 'capRatio') {
+    const cr = helpers.clamp((1 - localX / Math.max(1, width)) / 2, 0.12, 0.34);
+    return { ...params, capRatio: Number(cr.toFixed(2)) };
+  }
+  return params;
+}
+
+function onPreviewClick(localX, localY, width, height, params) {
+  const cur = Number(params.capRatio) || 0.2;
+  return { ...params, capRatio: cur > 0.22 ? 0.15 : 0.28 };
+}
+
+function buildPaths(width, height, params, helpers) {
+  const rx = helpers.clamp(Number(params.capRatio) || 0.2, 0.12, 0.34) * width;
+  const ry = height / 2;
+  const cy = height / 2;
+  const leftCx = rx;
+  const rightCx = width - rx;
+  return [
+    { nodes: helpers.rectPath(leftCx, 0, rightCx - leftCx, height, 0), closed: true },
+    { nodes: helpers.ellipsePath(leftCx, cy, rx, ry), closed: true },
+    { nodes: helpers.ellipsePath(rightCx, cy, rx, ry), closed: true }
+  ];
+}`,
+  },
+
+  // 64. Flowchart: Display / UI Screen Output Node
+  {
+    id: 'flow-display-output',
+    name: 'Flowchart: Display / UI Output',
+    category: 'Flow & Diagrams',
+    description: 'ISO-5807 Display symbol with pointed left nose and curved right screen edge for UI output and dashboards.',
+    iconName: 'Monitor',
+    isBuiltIn: true,
+    previewInteractive: true,
+    previewHint: 'Click in Preview Mode to adjust nose taper angle',
+    paramSchema: [
+      { key: 'label', label: 'Centered Node Text', type: 'string', defaultValue: 'Display Output' },
+      { key: 'noseRatio', label: 'Left Point Ratio', type: 'number', min: 0.14, max: 0.38, step: 0.01, defaultValue: 0.24 },
+    ],
+    defaultParams: { label: 'Display Output', noseRatio: 0.24 },
+    jsSourceCode: `// Flowchart: Display / UI Output (.jsf)
+function getControlPoints(width, height, params, helpers) {
+  const nr = helpers.clamp(Number(params.noseRatio) || 0.24, 0.14, 0.38);
+  return [
+    { id: 'noseRatio', label: \`Nose: \${Math.round(nr * 100)}%\`, x: width * nr, y: 0, cursor: 'ew-resize' }
+  ];
+}
+
+function onDragControlPoint(id, localX, localY, width, height, params, helpers) {
+  if (id === 'noseRatio') {
+    return { ...params, noseRatio: Number(helpers.clamp(localX / Math.max(1, width), 0.14, 0.38).toFixed(2)) };
+  }
+  return params;
+}
+
+function onPreviewClick(localX, localY, width, height, params) {
+  const cur = Number(params.noseRatio) || 0.24;
+  return { ...params, noseRatio: cur > 0.26 ? 0.18 : 0.32 };
+}
+
+function buildPaths(width, height, params, helpers) {
+  const nx = helpers.clamp(Number(params.noseRatio) || 0.24, 0.14, 0.38) * width;
+  const rx = width * 0.22;
+  const rightX = width - rx;
+  const cy = height / 2;
+  const k = 0.5522847498;
+  return [
+    {
+      nodes: [
+        helpers.cornerNode(0, cy),
+        helpers.cornerNode(nx, 0),
+        helpers.smoothNode(rightX, 0, rightX, 0, rightX + rx * k, 0),
+        helpers.smoothNode(width, cy, width, cy - cy * k, width, cy + cy * k),
+        helpers.smoothNode(rightX, height, rightX + rx * k, height, rightX, height),
+        helpers.cornerNode(nx, height)
+      ],
+      closed: true
+    }
+  ];
+}`,
+  },
+
+  // 65. Flowchart: Loop Limit (For / While Boundary)
+  {
+    id: 'flow-loop-limit',
+    name: 'Flowchart: Loop Limit (For / While)',
+    category: 'Flow & Diagrams',
+    description: 'ISO-5807 Loop Limit chamfered block — toggle between top-chamfered (Loop Start) and bottom-chamfered (Loop End).',
+    iconName: 'Repeat',
+    isBuiltIn: true,
+    previewInteractive: true,
+    previewHint: 'Click in Preview Mode to toggle between Loop Start (Top Chamfer) and Loop End (Bottom Chamfer)',
+    paramSchema: [
+      { key: 'label', label: 'Centered Node Text', type: 'string', defaultValue: 'Loop: For Each' },
+      { key: 'chamferRatio', label: 'Corner Chamfer Size', type: 'number', min: 0.12, max: 0.36, step: 0.01, defaultValue: 0.22 },
+      { key: 'loopEndMode', label: 'Loop End (Bottom Chamfer)', type: 'boolean', defaultValue: false },
+    ],
+    defaultParams: { label: 'Loop: For Each', chamferRatio: 0.22, loopEndMode: false },
+    jsSourceCode: `// Flowchart: Loop Limit (.jsf)
+function getControlPoints(width, height, params, helpers) {
+  const cr = helpers.clamp(Number(params.chamferRatio) || 0.22, 0.12, 0.36);
+  return [
+    { id: 'chamferRatio', label: \`Chamfer: \${Math.round(cr * 100)}%\`, x: width * cr, y: 0, cursor: 'ew-resize' }
+  ];
+}
+
+function onDragControlPoint(id, localX, localY, width, height, params, helpers) {
+  if (id === 'chamferRatio') {
+    return { ...params, chamferRatio: Number(helpers.clamp(localX / Math.max(1, width), 0.12, 0.36).toFixed(2)) };
+  }
+  return params;
+}
+
+function onPreviewClick(localX, localY, width, height, params) {
+  const nextEnd = !params.loopEndMode;
+  return { ...params, loopEndMode: nextEnd, label: nextEnd ? 'End Loop' : 'Loop: For Each' };
+}
+
+function buildPaths(width, height, params, helpers) {
+  const cr = helpers.clamp(Number(params.chamferRatio) || 0.22, 0.12, 0.36);
+  const cx = width * cr;
+  const cy = height * cr * 1.2;
+  const endMode = Boolean(params.loopEndMode);
+  const pts = endMode
+    ? [
+        { x: 0, y: 0 },
+        { x: width, y: 0 },
+        { x: width, y: height - cy },
+        { x: width - cx, y: height },
+        { x: cx, y: height },
+        { x: 0, y: height - cy }
+      ]
+    : [
+        { x: cx, y: 0 },
+        { x: width - cx, y: 0 },
+        { x: width, y: cy },
+        { x: width, y: height },
+        { x: 0, y: height },
+        { x: 0, y: cy }
+      ];
+  return [{ nodes: helpers.polygonPath(pts), closed: true }];
+}`,
+  },
+
+  // 66. Flowchart: Collate / Merge / Extract Symbol
+  {
+    id: 'flow-collate-merge',
+    name: 'Flowchart: Merge / Extract / Collate',
+    category: 'Flow & Diagrams',
+    description: 'ISO-5807 data combination symbol — morphs between Merge Triangle (down), Extract Triangle (up), and Collate Hourglass.',
+    iconName: 'Triangle',
+    isBuiltIn: true,
+    previewInteractive: true,
+    previewHint: 'Click in Preview Mode to cycle mode: Merge (Down) -> Extract (Up) -> Collate (Hourglass)',
+    paramSchema: [
+      { key: 'label', label: 'Centered Node Text', type: 'string', defaultValue: 'Merge' },
+      { key: 'shapeMode', label: 'Mode (0=Merge, 1=Extract, 2=Collate)', type: 'number', min: 0, max: 2, step: 1, defaultValue: 0 },
+    ],
+    defaultParams: { label: 'Merge', shapeMode: 0 },
+    jsSourceCode: `// Flowchart: Merge / Extract / Collate (.jsf)
+function getControlPoints(width, height, params, helpers) {
+  const mode = Math.round(helpers.clamp(Number(params.shapeMode) || 0, 0, 2));
+  const labels = ['Merge (Down)', 'Extract (Up)', 'Collate (Bowtie)'];
+  return [
+    { id: 'shapeMode', label: labels[mode] || 'Merge', x: helpers.lerp(width * 0.25, width * 0.75, mode / 2), y: 8, cursor: 'ew-resize' }
+  ];
+}
+
+function onDragControlPoint(id, localX, localY, width, height, params, helpers) {
+  if (id === 'shapeMode') {
+    const t = helpers.clamp((localX - width * 0.25) / (width * 0.5), 0, 1);
+    return { ...params, shapeMode: Math.round(t * 2) };
+  }
+  return params;
+}
+
+function onPreviewClick(localX, localY, width, height, params) {
+  const next = (Math.round(Number(params.shapeMode) || 0) + 1) % 3;
+  const names = ['Merge', 'Extract', 'Collate'];
+  return { ...params, shapeMode: next, label: names[next] };
+}
+
+function buildPaths(width, height, params, helpers) {
+  const mode = Math.round(helpers.clamp(Number(params.shapeMode) || 0, 0, 2));
+  const cx = width / 2;
+  const cy = height / 2;
+  if (mode === 1) {
+    return [{ nodes: helpers.polygonPath([{ x: cx, y: 0 }, { x: width, y: height }, { x: 0, y: height }]), closed: true }];
+  }
+  if (mode === 2) {
+    return [
+      { nodes: helpers.polygonPath([{ x: 0, y: 0 }, { x: width, y: 0 }, { x: cx, y: cy }]), closed: true },
+      { nodes: helpers.polygonPath([{ x: cx, y: cy }, { x: width, y: height }, { x: 0, y: height }]), closed: true }
+    ];
+  }
+  return [{ nodes: helpers.polygonPath([{ x: 0, y: 0 }, { x: width, y: 0 }, { x: cx, y: height }]), closed: true }];
+}`,
+  },
+
+  // 67. Flowchart: Summing / Logical OR Junction Circle
+  {
+    id: 'flow-summing-or-junction',
+    name: 'Flowchart: Summing / OR Junction',
+    category: 'Flow & Diagrams',
+    description: 'ISO-5807 Circular Junction node — toggle between Summing Junction (X cross), Logical OR (+ cross), and Inspection Circle.',
+    iconName: 'PlusCircle',
+    isBuiltIn: true,
+    previewInteractive: true,
+    previewHint: 'Click in Preview Mode to cycle: Summing (X) -> Logical OR (+) -> On-Page Connector (O)',
+    paramSchema: [
+      { key: 'label', label: 'Centered Node Text', type: 'string', defaultValue: 'Junction' },
+      { key: 'junctionType', label: 'Mode (0=Sum X, 1=OR +, 2=Circle)', type: 'number', min: 0, max: 2, step: 1, defaultValue: 0 },
+    ],
+    defaultParams: { label: 'Junction', junctionType: 0 },
+    jsSourceCode: `// Flowchart: Summing / OR Junction (.jsf)
+function getControlPoints(width, height, params, helpers) {
+  const jt = Math.round(helpers.clamp(Number(params.junctionType) || 0, 0, 2));
+  return [
+    { id: 'junctionType', label: jt === 0 ? 'Summing (X)' : jt === 1 ? 'Logical OR (+)' : 'Connector (O)', x: helpers.lerp(width * 0.25, width * 0.75, jt / 2), y: 8, cursor: 'ew-resize' }
+  ];
+}
+
+function onDragControlPoint(id, localX, localY, width, height, params, helpers) {
+  if (id === 'junctionType') {
+    const t = helpers.clamp((localX - width * 0.25) / (width * 0.5), 0, 1);
+    return { ...params, junctionType: Math.round(t * 2) };
+  }
+  return params;
+}
+
+function onPreviewClick(localX, localY, width, height, params) {
+  const next = (Math.round(Number(params.junctionType) || 0) + 1) % 3;
+  return { ...params, junctionType: next };
+}
+
+function buildPaths(width, height, params, helpers) {
+  const jt = Math.round(helpers.clamp(Number(params.junctionType) || 0, 0, 2));
+  const cx = width / 2;
+  const cy = height / 2;
+  const rx = width / 2;
+  const ry = height / 2;
+  const paths = [{ nodes: helpers.ellipsePath(cx, cy, rx, ry), closed: true }];
+  if (jt === 0) {
+    const dx = rx * 0.7071;
+    const dy = ry * 0.7071;
+    paths.push({ nodes: helpers.polygonPath([{ x: cx - dx, y: cy - dy }, { x: cx + dx, y: cy + dy }], false), closed: false });
+    paths.push({ nodes: helpers.polygonPath([{ x: cx + dx, y: cy - dy }, { x: cx - dx, y: cy + dy }], false), closed: false });
+  } else if (jt === 1) {
+    paths.push({ nodes: helpers.polygonPath([{ x: 0, y: cy }, { x: width, y: cy }], false), closed: false });
+    paths.push({ nodes: helpers.polygonPath([{ x: cx, y: 0 }, { x: cx, y: height }], false), closed: false });
+  }
+  return paths;
+}`,
+  },
+
+  // 68. Flowchart: Off-Page Reference Connector (Home-Plate Pentagon)
+  {
+    id: 'flow-offpage-connector',
+    name: 'Flowchart: Off-Page Connector',
+    category: 'Flow & Diagrams',
+    description: 'ISO-5807 Off-Page Reference pentagon for linking flowchart branches across multiple pages or sheets.',
+    iconName: 'ArrowDownCircle',
+    isBuiltIn: true,
+    previewInteractive: true,
+    previewHint: 'Click in Preview Mode to adjust bottom chevron point depth',
+    paramSchema: [
+      { key: 'label', label: 'Centered Node Text', type: 'string', defaultValue: 'Page 2A' },
+      { key: 'shoulderRatio', label: 'Shoulder Height Ratio', type: 'number', min: 0.45, max: 0.85, step: 0.01, defaultValue: 0.66 },
+    ],
+    defaultParams: { label: 'Page 2A', shoulderRatio: 0.66 },
+    jsSourceCode: `// Flowchart: Off-Page Connector (.jsf)
+function getControlPoints(width, height, params, helpers) {
+  const sr = helpers.clamp(Number(params.shoulderRatio) || 0.66, 0.45, 0.85);
+  return [
+    { id: 'shoulderRatio', label: \`Point: \${Math.round(sr * 100)}%\`, x: width, y: height * sr, cursor: 'ns-resize' }
+  ];
+}
+
+function onDragControlPoint(id, localX, localY, width, height, params, helpers) {
+  if (id === 'shoulderRatio') {
+    return { ...params, shoulderRatio: Number(helpers.clamp(localY / Math.max(1, height), 0.45, 0.85).toFixed(2)) };
+  }
+  return params;
+}
+
+function onPreviewClick(localX, localY, width, height, params) {
+  const cur = Number(params.shoulderRatio) || 0.66;
+  return { ...params, shoulderRatio: cur > 0.68 ? 0.56 : 0.74 };
+}
+
+function buildPaths(width, height, params, helpers) {
+  const sy = helpers.clamp(Number(params.shoulderRatio) || 0.66, 0.45, 0.85) * height;
+  return [
+    {
+      nodes: helpers.polygonPath([
+        { x: 0, y: 0 },
+        { x: width, y: 0 },
+        { x: width, y: sy },
+        { x: width / 2, y: height },
+        { x: 0, y: sy }
+      ]),
+      closed: true
+    }
+  ];
+}`,
+  },
+
+  // 69. Flowchart: Annotation / Spec Comment Callout Bracket
+  {
+    id: 'flow-annotation-callout',
+    name: 'Flowchart: Annotation Bracket',
+    category: 'Flow & Diagrams',
+    description: 'ISO-5807 open annotation bracket with leader stem for attaching technical notes or business rules to flowchart steps.',
+    iconName: 'MessageSquare',
+    isBuiltIn: true,
+    previewInteractive: true,
+    previewHint: 'Click in Preview Mode to toggle full card enclosure vs open ISO bracket',
+    paramSchema: [
+      { key: 'label', label: 'Centered Node Text', type: 'string', defaultValue: '// Spec Note' },
+      { key: 'leadRatio', label: 'Left Leader Stem Ratio', type: 'number', min: 0.1, max: 0.35, step: 0.01, defaultValue: 0.2 },
+      { key: 'closedBox', label: 'Show Dashed Note Box', type: 'boolean', defaultValue: true },
+    ],
+    defaultParams: { label: '// Spec Note', leadRatio: 0.2, closedBox: true },
+    jsSourceCode: `// Flowchart: Annotation Bracket (.jsf)
+function getControlPoints(width, height, params, helpers) {
+  const lr = helpers.clamp(Number(params.leadRatio) || 0.2, 0.1, 0.35);
+  return [
+    { id: 'leadRatio', label: \`Stem: \${Math.round(lr * 100)}%\`, x: width * lr, y: height * 0.5, cursor: 'ew-resize' }
+  ];
+}
+
+function onDragControlPoint(id, localX, localY, width, height, params, helpers) {
+  if (id === 'leadRatio') {
+    return { ...params, leadRatio: Number(helpers.clamp(localX / Math.max(1, width), 0.1, 0.35).toFixed(2)) };
+  }
+  return params;
+}
+
+function onPreviewClick(localX, localY, width, height, params) {
+  return { ...params, closedBox: !params.closedBox };
+}
+
+function buildPaths(width, height, params, helpers) {
+  const lx = helpers.clamp(Number(params.leadRatio) || 0.2, 0.1, 0.35) * width;
+  const cy = height / 2;
+  const paths = [
+    { nodes: helpers.polygonPath([{ x: 0, y: cy }, { x: lx, y: cy }], false), closed: false }
+  ];
+  if (params.closedBox) {
+    paths.push({ nodes: helpers.rectPath(lx, 0, width - lx, height, 4), closed: true });
+  } else {
+    paths.push({
+      nodes: helpers.polygonPath([
+        { x: width, y: 0 },
+        { x: lx, y: 0 },
+        { x: lx, y: height },
+        { x: width, y: height }
+      ], false),
+      closed: false
+    });
+  }
+  return paths;
+}`,
+  },
+
+  // 70. Sitemap: Directory / Route Folder Group
+  {
+    id: 'sitemap-folder-group',
+    name: 'Sitemap: Directory / Route Folder',
+    category: 'Flow & Diagrams',
+    description: 'Information architecture folder container with top directory tab for grouping route subtrees (e.g. /app/*, /api/v1/*).',
+    iconName: 'Folder',
+    isBuiltIn: true,
+    previewInteractive: true,
+    previewHint: 'Click in Preview Mode to toggle inner route file cards',
+    paramSchema: [
+      { key: 'label', label: 'Centered Node Text', type: 'string', defaultValue: '/app/routes/*' },
+      { key: 'tabWidthRatio', label: 'Folder Tab Width Ratio', type: 'number', min: 0.25, max: 0.65, step: 0.01, defaultValue: 0.42 },
+      { key: 'showFiles', label: 'Show Inner Route Cards', type: 'boolean', defaultValue: true },
+    ],
+    defaultParams: { label: '/app/routes/*', tabWidthRatio: 0.42, showFiles: true },
+    jsSourceCode: `// Sitemap: Directory / Route Folder (.jsf)
+function getControlPoints(width, height, params, helpers) {
+  const tw = helpers.clamp(Number(params.tabWidthRatio) || 0.42, 0.25, 0.65);
+  return [
+    { id: 'tabWidthRatio', label: \`Tab: \${Math.round(tw * 100)}%\`, x: width * tw, y: height * 0.16, cursor: 'ew-resize' }
+  ];
+}
+
+function onDragControlPoint(id, localX, localY, width, height, params, helpers) {
+  if (id === 'tabWidthRatio') {
+    return { ...params, tabWidthRatio: Number(helpers.clamp(localX / Math.max(1, width), 0.25, 0.65).toFixed(2)) };
+  }
+  return params;
+}
+
+function onPreviewClick(localX, localY, width, height, params) {
+  return { ...params, showFiles: !params.showFiles };
+}
+
+function buildPaths(width, height, params, helpers) {
+  const tw = helpers.clamp(Number(params.tabWidthRatio) || 0.42, 0.25, 0.65) * width;
+  const tabH = height * 0.16;
+  const paths = [
+    {
+      nodes: helpers.polygonPath([
+        { x: 0, y: 0 },
+        { x: tw - tabH * 0.6, y: 0 },
+        { x: tw, y: tabH },
+        { x: width, y: tabH },
+        { x: width, y: height },
+        { x: 0, y: height }
+      ]),
+      closed: true
+    }
+  ];
+  if (params.showFiles) {
+    const pad = Math.max(8, width * 0.08);
+    const cardW = (width - pad * 3) / 2;
+    const cardH = height - tabH - pad * 2;
+    paths.push({ nodes: helpers.rectPath(pad, tabH + pad, cardW, cardH, 3), closed: true });
+    paths.push({ nodes: helpers.rectPath(pad * 2 + cardW, tabH + pad, cardW, cardH, 3), closed: true });
+  }
+  return paths;
+}`,
+  },
+
+  // 71. Sitemap: File / PDF / Asset Download Node
+  {
+    id: 'sitemap-file-download',
+    name: 'Sitemap: File / PDF Download Node',
+    category: 'Flow & Diagrams',
+    description: 'Downloadable static asset node (PDF brochure, ZIP SDK, CSV export) with folded corner and download arrow emblem.',
+    iconName: 'Download',
+    isBuiltIn: true,
+    previewInteractive: true,
+    previewHint: 'Click in Preview Mode to toggle download arrow scale',
+    paramSchema: [
+      { key: 'label', label: 'Centered Node Text', type: 'string', defaultValue: 'Download PDF' },
+      { key: 'foldRatio', label: 'Corner Fold Size', type: 'number', min: 0.14, max: 0.34, step: 0.01, defaultValue: 0.22 },
+    ],
+    defaultParams: { label: 'Download PDF', foldRatio: 0.22 },
+    jsSourceCode: `// Sitemap: File / PDF Download Node (.jsf)
+function getControlPoints(width, height, params, helpers) {
+  const fr = helpers.clamp(Number(params.foldRatio) || 0.22, 0.14, 0.34);
+  return [
+    { id: 'foldRatio', label: \`Fold: \${Math.round(fr * 100)}%\`, x: width * (1 - fr), y: height * fr, cursor: 'nesw-resize' }
+  ];
+}
+
+function onDragControlPoint(id, localX, localY, width, height, params, helpers) {
+  if (id === 'foldRatio') {
+    const fr = helpers.clamp(1 - localX / Math.max(1, width), 0.14, 0.34);
+    return { ...params, foldRatio: Number(fr.toFixed(2)) };
+  }
+  return params;
+}
+
+function onPreviewClick(localX, localY, width, height, params) {
+  const cur = Number(params.foldRatio) || 0.22;
+  return { ...params, foldRatio: cur > 0.24 ? 0.16 : 0.28 };
+}
+
+function buildPaths(width, height, params, helpers) {
+  const fr = helpers.clamp(Number(params.foldRatio) || 0.22, 0.14, 0.34);
+  const fx = width * (1 - fr);
+  const fy = height * fr;
+  const cx = width / 2;
+  const cy = height * 0.56;
+  const aw = Math.min(width, height) * 0.18;
+  return [
+    {
+      nodes: helpers.polygonPath([
+        { x: 0, y: 0 },
+        { x: fx, y: 0 },
+        { x: width, y: fy },
+        { x: width, y: height },
+        { x: 0, y: height }
+      ]),
+      closed: true
+    },
+    {
+      nodes: helpers.polygonPath([
+        { x: fx, y: 0 },
+        { x: fx, y: fy },
+        { x: width, y: fy }
+      ]),
+      closed: true
+    },
+    // Downward download arrow + tray
+    { nodes: helpers.polygonPath([{ x: cx, y: cy - aw }, { x: cx, y: cy + aw * 0.6 }], false), closed: false },
+    { nodes: helpers.polygonPath([{ x: cx - aw * 0.7, y: cy }, { x: cx, y: cy + aw * 0.7 }, { x: cx + aw * 0.7, y: cy }], false), closed: false },
+    { nodes: helpers.polygonPath([{ x: cx - aw, y: cy + aw }, { x: cx + aw, y: cy + aw }], false), closed: false }
+  ];
+}`,
+  },
+
+  // 72. Sitemap: Dynamic CMS Collection Template (`[slug]`)
+  {
+    id: 'sitemap-dynamic-slug-route',
+    name: 'Sitemap: Dynamic Route ([slug])',
+    category: 'Flow & Diagrams',
+    description: 'Database-driven repeating CMS template route (e.g. /products/[slug] or /posts/[id]) with cascaded collection cards.',
+    iconName: 'Database',
+    isBuiltIn: true,
+    previewInteractive: true,
+    previewHint: 'Click in Preview Mode to cycle cascaded template instances (2-4)',
+    paramSchema: [
+      { key: 'label', label: 'Centered Node Text', type: 'string', defaultValue: '/blog/[slug]' },
+      { key: 'instances', label: 'Collection Cards', type: 'number', min: 2, max: 4, step: 1, defaultValue: 3 },
+    ],
+    defaultParams: { label: '/blog/[slug]', instances: 3 },
+    jsSourceCode: `// Sitemap: Dynamic CMS Route ([slug]) (.jsf)
+function getControlPoints(width, height, params, helpers) {
+  const inst = Math.round(helpers.clamp(Number(params.instances) || 3, 2, 4));
+  return [
+    { id: 'instances', label: \`Items: \${inst}\`, x: helpers.lerp(width * 0.25, width * 0.75, (inst - 2) / 2), y: height - 8, cursor: 'ew-resize' }
+  ];
+}
+
+function onDragControlPoint(id, localX, localY, width, height, params, helpers) {
+  if (id === 'instances') {
+    const t = helpers.clamp((localX - width * 0.25) / (width * 0.5), 0, 1);
+    return { ...params, instances: Math.round(2 + t * 2) };
+  }
+  return params;
+}
+
+function onPreviewClick(localX, localY, width, height, params) {
+  const next = ((Math.round(Number(params.instances) || 3) - 1) % 3) + 2;
+  return { ...params, instances: next };
+}
+
+function buildPaths(width, height, params, helpers) {
+  const inst = Math.round(helpers.clamp(Number(params.instances) || 3, 2, 4));
+  const step = 8;
+  const cw = width - step * (inst - 1);
+  const ch = height - step * (inst - 1);
+  const paths = [];
+  for (let i = inst - 1; i >= 0; i--) {
+    paths.push({ nodes: helpers.rectPath(i * step, (inst - 1 - i) * step, cw, ch, 4), closed: true });
+  }
+  const fy = (inst - 1) * step;
+  paths.push({ nodes: helpers.polygonPath([{ x: 0, y: fy + ch * 0.24 }, { x: cw, y: fy + ch * 0.24 }], false), closed: false });
+  return paths;
+}`,
+  },
 ];
 
+export const SITEMAP_AND_FLOW_AUTOSHAPES: AutoShapeDefinition[] =
+  RAW_SITEMAP_AND_FLOW_AUTOSHAPES.map((shape): AutoShapeDefinition => {
+    const hasLabelSchema = shape.paramSchema.some((p) => p.key === 'label');
+    const conciseDefault =
+      typeof shape.defaultParams.label === 'string'
+        ? shape.defaultParams.label
+        : shape.name
+            .replace(/^(Sitemap|Flowchart|Flow):\s*/i, '')
+            .replace(/\s+Node$/i, '')
+            .slice(0, 22);
+    return {
+      ...shape,
+      paramSchema: hasLabelSchema
+        ? shape.paramSchema
+        : [
+            {
+              key: 'label',
+              label: 'Centered Node Text',
+              type: 'string',
+              defaultValue: conciseDefault,
+            },
+            ...shape.paramSchema,
+          ],
+      defaultParams: {
+        label: conciseDefault,
+        ...shape.defaultParams,
+      },
+    };
+  });

@@ -1574,6 +1574,7 @@ export const LayersAndHistoryPanel: React.FC<LayersAndHistoryPanelProps> = ({
       'Data & Charts': 'Data & Charts',
       'Badges & Icons': 'Badges & Icons',
       'Flow & Diagrams': 'Sitemaps & Flow',
+      'Drone Parts & Frames': 'Drone Parts',
       'Creative & Vector': 'Creative',
       'Custom JS': 'Custom JS',
       Basic: 'Basic',
@@ -1589,7 +1590,7 @@ export const LayersAndHistoryPanel: React.FC<LayersAndHistoryPanelProps> = ({
             type="text"
             value={shapeSearchQuery}
             onChange={(e) => setShapeSearchQuery(e.target.value)}
-            placeholder={`Search ${autoShapes.length} AutoShapes (Sitemap, Bento, Hero, Tabs)...`}
+            placeholder={`Search ${autoShapes.length} AutoShapes (Flowchart, Sitemap, Drone, Bento)...`}
             className="flex-1 min-w-0 bg-[#141414] border border-[#2e2e2e] focus:border-[#ffffff] rounded-none px-2 py-1 text-[10px] font-mono text-[#f5f5f5] placeholder-[#666666] outline-none"
           />
           {shapeSearchQuery && (

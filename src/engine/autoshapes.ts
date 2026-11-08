@@ -7,6 +7,7 @@ import type {
 } from '../types/editor';
 import { WEB_LAYOUT_AND_UI_AUTOSHAPES } from './webLayoutAutoshapes';
 import { SITEMAP_AND_FLOW_AUTOSHAPES } from './sitemapAndFlowAutoshapes';
+import { DRONE_PARTS_AND_FRAMES_AUTOSHAPES } from './droneAutoshapes';
 
 export const CUSTOM_AUTOSHAPES_STORAGE_KEY = 'evolve_mx_custom_autoshapes_v1';
 
@@ -232,7 +233,7 @@ export function createAutoShapeHelpers(): AutoShapeHelpers {
 /**
  * 16 Built-In Osito Programmable Smart AutoShapes (.jsf style)
  */
-export const DEFAULT_AUTOSHAPES: AutoShapeDefinition[] = [
+const RAW_DEFAULT_AUTOSHAPES: AutoShapeDefinition[] = [
   // 1. Smart Rounded / Chamfered Rectangle
   {
     id: 'rounded-rect',
@@ -2594,6 +2595,7 @@ function buildPaths(width, height, params, helpers) {
   },
   ...WEB_LAYOUT_AND_UI_AUTOSHAPES,
   ...SITEMAP_AND_FLOW_AUTOSHAPES,
+  ...DRONE_PARTS_AND_FRAMES_AUTOSHAPES,
   // 17. Smart Regular Polygon & Hexagon Core
   {
     id: 'polygon',
@@ -2820,6 +2822,50 @@ function buildPaths(width, height, params, helpers) {
 }`,
   },
 ];
+
+export const DEFAULT_AUTOSHAPES: AutoShapeDefinition[] =
+  RAW_DEFAULT_AUTOSHAPES.map((shape): AutoShapeDefinition => {
+    const isFlowOrSitemapOrDrone =
+      shape.category === 'Flow & Diagrams' ||
+      shape.category === 'Drone Parts & Frames' ||
+      shape.id.startsWith('sitemap-') ||
+      shape.id.startsWith('flow-') ||
+      shape.id === 'workflow-decision' ||
+      shape.id === 'database-cylinder';
+
+    if (!isFlowOrSitemapOrDrone) {
+      return shape;
+    }
+
+    const hasLabelSchema = shape.paramSchema.some((p) => p.key === 'label');
+    const conciseDefault =
+      typeof shape.defaultParams.label === 'string'
+        ? shape.defaultParams.label
+        : shape.name
+            .replace(/^(Smart|Sitemap|Flowchart|Flow|Drone|Drone Part):\s*/i, '')
+            .replace(/^Smart\s+/i, '')
+            .replace(/\s+Node$/i, '')
+            .slice(0, 22);
+
+    return {
+      ...shape,
+      paramSchema: hasLabelSchema
+        ? shape.paramSchema
+        : [
+            {
+              key: 'label',
+              label: 'Centered Node Text',
+              type: 'string',
+              defaultValue: conciseDefault,
+            },
+            ...shape.paramSchema,
+          ],
+      defaultParams: {
+        label: conciseDefault,
+        ...shape.defaultParams,
+      },
+    };
+  });
 
 /**
  * Starter template when clicking "+ New Custom JS AutoShape" in the AutoShape Code Studio
@@ -3280,6 +3326,9 @@ export function convertAutoShapeToVectorPath(
     strokeAlign: obj.strokeAlign,
     pixelSnap: obj.pixelSnap,
     shadow: { ...obj.shadow },
+    activeState: obj.activeState,
+    stateVariants: obj.stateVariants ? { ...obj.stateVariants } : undefined,
+    params: obj.params ? { ...obj.params } : undefined,
     nodes: flattenedNodes,
     closed: isClosed,
   };

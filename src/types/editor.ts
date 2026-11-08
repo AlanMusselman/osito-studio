@@ -204,6 +204,7 @@ export type AutoShapeCategory =
   | 'Data & Charts'
   | 'Badges & Icons'
   | 'Flow & Diagrams'
+  | 'Drone Parts & Frames'
   | 'Creative & Vector'
   | 'Custom JS'
   | 'Basic'
@@ -216,6 +217,7 @@ export const AUTOSHAPE_GROUP_ORDER: AutoShapeCategory[] = [
   'Data & Charts',
   'Badges & Icons',
   'Flow & Diagrams',
+  'Drone Parts & Frames',
   'Creative & Vector',
   'Custom JS',
 ];
@@ -305,6 +307,8 @@ export interface GridAndSnapSettings {
   showToolHints?: boolean;    // Show or hide the middle-top contextual tool tips bar
   canvasViewMode?: 'design' | 'slice' | 'preview'; // Top-left Canvas View Mode Switcher
   sliceToolMode?: 'slice' | 'crop'; // Whether 'crop' (C) draws web export slices or crops document
+  autoConnectors?: boolean;   // Toggle automatic Smart Connectors & N/E/S/W magnetic port auto-linking
+  autoConnectorRouting?: ConnectorRoutingStyle; // Default routing style ('elbow' | 'curved' | 'straight')
   guides: Array<{ id: string; orientation: 'horizontal' | 'vertical'; position: number }>;
 }
 

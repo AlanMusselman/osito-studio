@@ -450,6 +450,117 @@ function escapeXml(raw: string): string {
 }
 
 /**
+ * Word-wraps a centered AutoShape or VectorPath node label into up to 4 lines and emits
+ * SVG `<rect>` pill backdrop (when `subPathCount > 1`) + `<text>` / `<tspan>` elements with
+ * relative luminance contrast (`#0a0a0a` on light fills, `#ffffff` on dark fills).
+ */
+function buildCenteredSvgLabelElements(
+  obj: CanvasObject,
+  rawLabel: string,
+  subPathCount: number,
+  opacityAttr: string,
+  transformAttr: string
+): string[] {
+  const trimmed = rawLabel.trim();
+  const ow = obj.width || 0;
+  const oh = obj.height || 0;
+  if (!trimmed || ow < 28 || oh < 18) return [];
+
+  const customFs = Number(obj.params?.fontSize);
+  const fontSize =
+    Number.isFinite(customFs) && customFs >= 8 && customFs <= 64
+      ? customFs
+      : Math.round(Math.max(10, Math.min(14, Math.min(ow, oh) * 0.125)));
+
+  const maxTextW = Math.max(20, ow - 16);
+  const approxCharW = fontSize * 0.56;
+  const maxCharsPerLine = Math.max(4, Math.floor(maxTextW / approxCharW));
+
+  const wrappedLines: string[] = [];
+  for (const paragraph of trimmed.split('\n')) {
+    const pTrim = paragraph.trim();
+    if (!pTrim) continue;
+    const words = pTrim.split(/\s+/);
+    let currentLine = '';
+    for (const word of words) {
+      if (!currentLine) {
+        currentLine = word;
+      } else if (currentLine.length + 1 + word.length <= maxCharsPerLine) {
+        currentLine += ' ' + word;
+      } else {
+        wrappedLines.push(currentLine);
+        currentLine = word;
+      }
+    }
+    if (currentLine) wrappedLines.push(currentLine);
+  }
+  const lines = (wrappedLines.length > 0 ? wrappedLines : [trimmed]).slice(0, 4);
+  const lineHeight = Math.round(fontSize * 1.24);
+  const totalTextH = lines.length * lineHeight;
+  const cx = Math.round((obj.x + ow / 2) * 10) / 10;
+  const cy = Math.round((obj.y + oh / 2) * 10) / 10;
+  const startY = Math.round((cy - totalTextH / 2 + lineHeight / 2) * 10) / 10;
+
+  const customColor =
+    typeof obj.params?.textColor === 'string' && obj.params.textColor.trim()
+      ? obj.params.textColor.trim()
+      : '';
+
+  const out: string[] = [];
+  let textFill = customColor || '#ffffff';
+
+  if (subPathCount > 1) {
+    let maxChars = 0;
+    for (const ln of lines) {
+      if (ln.length > maxChars) maxChars = ln.length;
+    }
+    const pillW = Math.min(ow - 6, Math.max(32, Math.ceil(maxChars * approxCharW + 14)));
+    const pillH = Math.min(oh - 4, Math.max(18, Math.ceil(totalTextH + 8)));
+    const pillX = Math.round(cx - pillW / 2);
+    const pillY = Math.round(cy - pillH / 2);
+    out.push(
+      `  <rect x="${pillX}" y="${pillY}" width="${pillW}" height="${pillH}" rx="4" fill="#0a0a0a" fill-opacity="0.82" stroke="#ffffff" stroke-opacity="0.24" stroke-width="1"${opacityAttr}${transformAttr} />`
+    );
+  } else if (!customColor) {
+    const rawFill = (obj.fill || '').trim();
+    const hasFill =
+      Boolean(rawFill) &&
+      rawFill !== 'none' &&
+      rawFill !== 'transparent' &&
+      obj.fillType !== 'none';
+    if (hasFill && rawFill.startsWith('#')) {
+      const hex = rawFill.slice(1);
+      const fullHex =
+        hex.length === 3
+          ? hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2]
+          : hex.padEnd(6, '0').slice(0, 6);
+      const r = parseInt(fullHex.slice(0, 2), 16) || 0;
+      const g = parseInt(fullHex.slice(2, 4), 16) || 0;
+      const b = parseInt(fullHex.slice(4, 6), 16) || 0;
+      const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      textFill = lum > 0.68 ? '#0a0a0a' : '#ffffff';
+    }
+  }
+
+  if (lines.length === 1) {
+    out.push(
+      `  <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="central" fill="${escapeXml(textFill)}" font-family="Inter, system-ui, sans-serif" font-size="${fontSize}" font-weight="600"${opacityAttr}${transformAttr}>${escapeXml(lines[0])}</text>`
+    );
+  } else {
+    const tspans = lines
+      .map(
+        (ln, idx) =>
+          `<tspan x="${cx}" y="${Math.round((startY + idx * lineHeight) * 10) / 10}">${escapeXml(ln)}</tspan>`
+      )
+      .join('');
+    out.push(
+      `  <text x="${cx}" y="${startY}" text-anchor="middle" dominant-baseline="central" fill="${escapeXml(textFill)}" font-family="Inter, system-ui, sans-serif" font-size="${fontSize}" font-weight="600"${opacityAttr}${transformAttr}>${tspans}</text>`
+    );
+  }
+  return out;
+}
+
+/**
  * Generates clean vector SVG markup for a single `CanvasSlice` region.
  */
 export function buildSliceSvgMarkup(
@@ -588,6 +699,9 @@ export function buildSliceSvgMarkup(
             `  <text x="${Math.round(midX)}" y="${Math.round(midY + 3.5)}" fill="#ffffff" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" text-anchor="middle">${escapeXml(lbl)}</text>`
           );
         }
+      } else if (typeof obj.params?.label === 'string' && obj.params.label.trim().length > 0 && (obj.width || 0) >= 28 && (obj.height || 0) >= 18) {
+        const vecLines = buildCenteredSvgLabelElements(obj, obj.params.label, 1, opacityAttr, transformAttr);
+        body.push(...vecLines);
       }
     } else if (obj.type === 'autoshape') {
       const shapeDef =
@@ -608,6 +722,24 @@ export function buildSliceSvgMarkup(
         body.push(
           `  <path d="${subDs.join(' ')}" fill="${fillAttr}" fill-rule="evenodd"${strokeAttr}${opacityAttr}${transformAttr} />`
         );
+      }
+      const rawNodeText =
+        typeof obj.params?.label === 'string'
+          ? obj.params.label
+          : typeof obj.params?.text === 'string'
+          ? obj.params.text
+          : obj.params?.label === undefined && typeof shapeDef.defaultParams?.label === 'string'
+          ? String(shapeDef.defaultParams.label)
+          : '';
+      if (rawNodeText.trim().length > 0 && (obj.width || 0) >= 28 && (obj.height || 0) >= 18) {
+        const labelEls = buildCenteredSvgLabelElements(
+          obj,
+          rawNodeText,
+          evaluated.paths.length,
+          opacityAttr,
+          transformAttr
+        );
+        body.push(...labelEls);
       }
     } else if (obj.type === 'text') {
       const fontSize = obj.fontSize || 16;
@@ -1099,8 +1231,14 @@ export async function exportFullReactTailwindAppZip(
   const navbarMaxY = navbarObj ? navbarObj.y + navbarObj.height + 6 : 68;
   const serializedLayers = visibleObjects.map((obj) => {
     let svgPathD = '';
+    let nodeLabel = '';
     if (obj.type === 'vector-path') {
       svgPathD = bezierNodesToSvgPathD(obj.nodes, obj.closed, 0, 0);
+      nodeLabel = obj.connectorMeta?.label
+        ? obj.connectorMeta.label.trim()
+        : typeof obj.params?.label === 'string'
+        ? obj.params.label.trim()
+        : '';
     } else if (obj.type === 'autoshape') {
       const shapeDef =
         autoShapes.find((d) => d.id === obj.shapeDefId) ||
@@ -1117,6 +1255,15 @@ export async function exportFullReactTailwindAppZip(
         .map((p) => bezierNodesToSvgPathD(p.nodes, p.closed, 0, 0))
         .filter(Boolean)
         .join(' ');
+      const rawNodeText =
+        typeof obj.params?.label === 'string'
+          ? obj.params.label
+          : typeof obj.params?.text === 'string'
+          ? obj.params.text
+          : obj.params?.label === undefined && typeof shapeDef.defaultParams?.label === 'string'
+          ? String(shapeDef.defaultParams.label)
+          : '';
+      nodeLabel = rawNodeText.trim();
     }
     return {
       id: obj.id,
@@ -1145,6 +1292,7 @@ export async function exportFullReactTailwindAppZip(
       imageDataUrl: obj.type === 'bitmap' ? obj.imageDataUrl : undefined,
       shapeDefId: obj.type === 'autoshape' ? obj.shapeDefId : undefined,
       svgPathD,
+      nodeLabel: nodeLabel || undefined,
       isBelowNavbar: obj.y >= navbarMaxY - 4,
       isStaticNavbarChild:
         Boolean(navbarObj) &&
@@ -1704,6 +1852,21 @@ export async function exportFullReactTailwindAppZip(
       `                stroke={stroke && stroke !== 'none' ? stroke : 'none'}`,
       `                strokeWidth={strokeWidth || 0}`,
       `              />`,
+      `              {layer.nodeLabel && (`,
+      `                <text`,
+      `                  x={layer.width / 2}`,
+      `                  y={layer.height / 2}`,
+      `                  textAnchor="middle"`,
+      `                  dominantBaseline="central"`,
+      `                  fill="#f8fafc"`,
+      `                  fontFamily="Inter, system-ui, sans-serif"`,
+      `                  fontSize={Math.round(Math.max(10, Math.min(14, Math.min(layer.width, layer.height) * 0.125)))}`,
+      `                  fontWeight="600"`,
+      `                  style={{ pointerEvents: 'none', userSelect: 'none' }}`,
+      `                >`,
+      `                  {layer.nodeLabel}`,
+      `                </text>`,
+      `              )}`,
       `            </svg>`,
       `          );`,
       `        }`,

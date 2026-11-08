@@ -136,6 +136,7 @@ interface DragInteraction {
   lastPaintPoint?: { x: number; y: number };
   floatingStart?: { x: number; y: number };
   isShiftConstrained?: boolean;
+  autoConnectFromId?: string;
 }
 
 /**
@@ -522,6 +523,39 @@ export function renderCanvasObjectToContext(
         ctx.fillText(labelStr, midX, midY + 0.5);
         ctx.restore();
       }
+    } else if (typeof vec.params?.label === 'string' && vec.params.label.trim().length > 0 && ow >= 28 && oh >= 18) {
+      const trimmedVecLabel = vec.params.label.trim();
+      const customFs = Number(vec.params?.fontSize);
+      const fontSize =
+        Number.isFinite(customFs) && customFs >= 8 && customFs <= 64
+          ? customFs
+          : Math.round(Math.max(10, Math.min(14, Math.min(ow, oh) * 0.125)));
+      ctx.save();
+      ctx.font = `600 ${fontSize}px "Inter", system-ui, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const maxTextW = Math.max(20, ow - 16);
+      const wrappedLines = wrapTextToBoxWidth(ctx, trimmedVecLabel, maxTextW).slice(0, 4);
+      const lineHeight = Math.round(fontSize * 1.24);
+      const totalTextH = wrappedLines.length * lineHeight;
+      const startY = oh / 2 - totalTextH / 2 + lineHeight / 2;
+      const customTextColor =
+        typeof vec.params?.textColor === 'string' && vec.params.textColor.trim()
+          ? vec.params.textColor.trim()
+          : '';
+      const baseHex = toHexColor(vec.fill, '#3b82f6').replace('#', '');
+      const r = parseInt(baseHex.slice(0, 2) || '3b', 16);
+      const g = parseInt(baseHex.slice(2, 4) || '82', 16);
+      const b = parseInt(baseHex.slice(4, 6) || 'f6', 16);
+      const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      const hasFill = Boolean(vec.fill) && vec.fill !== 'none' && vec.fillType !== 'none';
+      ctx.fillStyle = customTextColor || (hasFill && lum > 0.68 ? '#0a0a0a' : '#ffffff');
+      ctx.shadowColor = hasFill && lum > 0.68 ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.65)';
+      ctx.shadowBlur = 3;
+      wrappedLines.forEach((line, idx) => {
+        ctx.fillText(line, ow / 2, Math.round(startY + idx * lineHeight));
+      });
+      ctx.restore();
     }
   } else if (obj.type === 'autoshape') {
     const asObj = obj as AutoShapeObject;
@@ -611,6 +645,86 @@ export function renderCanvasObjectToContext(
           ctx.stroke();
           ctx.restore();
         }
+      }
+
+      // Render Centered Textblock inside Flowchart / Sitemap / Drone AutoShapes (and any AutoShape with a label)
+      const rawNodeText =
+        typeof asObj.params?.label === 'string'
+          ? asObj.params.label
+          : typeof asObj.params?.text === 'string'
+          ? asObj.params.text
+          : asObj.params?.label === undefined && typeof def.defaultParams?.label === 'string'
+          ? String(def.defaultParams.label)
+          : '';
+      const trimmedLabel = rawNodeText.trim();
+      if (trimmedLabel.length > 0 && ow >= 28 && oh >= 18) {
+        const customFs = Number(asObj.params?.fontSize);
+        const fontSize =
+          Number.isFinite(customFs) && customFs >= 8 && customFs <= 64
+            ? customFs
+            : Math.round(Math.max(10, Math.min(14, Math.min(ow, oh) * 0.125)));
+
+        ctx.save();
+        ctx.font = `600 ${fontSize}px "Inter", system-ui, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        const maxTextW = Math.max(20, ow - 16);
+        const wrappedLines = wrapTextToBoxWidth(ctx, trimmedLabel, maxTextW).slice(0, 4);
+        const lineHeight = Math.round(fontSize * 1.24);
+        const totalTextH = wrappedLines.length * lineHeight;
+        const centerX = ow / 2;
+        const centerY = oh / 2;
+        const startY = centerY - totalTextH / 2 + lineHeight / 2;
+
+        let maxLineW = 0;
+        for (const ln of wrappedLines) {
+          const w = ctx.measureText(ln).width;
+          if (w > maxLineW) maxLineW = w;
+        }
+
+        const customTextColor =
+          typeof asObj.params?.textColor === 'string' && asObj.params.textColor.trim()
+            ? asObj.params.textColor.trim()
+            : '';
+
+        // Draw high-contrast centered text badge pill when shape has internal wireframe paths or light/transparent fill
+        if (evaluated.paths.length > 1) {
+          const pillW = Math.min(ow - 6, Math.max(32, Math.ceil(maxLineW + 14)));
+          const pillH = Math.min(oh - 4, Math.max(18, Math.ceil(totalTextH + 8)));
+          const pillX = Math.round(centerX - pillW / 2);
+          const pillY = Math.round(centerY - pillH / 2);
+          ctx.fillStyle = 'rgba(10, 10, 10, 0.82)';
+          ctx.beginPath();
+          if (typeof ctx.roundRect === 'function') {
+            ctx.roundRect(pillX, pillY, pillW, pillH, 4);
+          } else {
+            ctx.rect(pillX, pillY, pillW, pillH);
+          }
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.24)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.fillStyle = customTextColor || '#ffffff';
+        } else {
+          const baseHex = toHexColor(asObj.fill, '#3b82f6').replace('#', '');
+          const r = parseInt(baseHex.slice(0, 2) || '3b', 16);
+          const g = parseInt(baseHex.slice(2, 4) || '82', 16);
+          const b = parseInt(baseHex.slice(4, 6) || 'f6', 16);
+          const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+          const hasFill =
+            Boolean(asObj.fill) && asObj.fill !== 'none' && asObj.fillType !== 'none';
+          ctx.fillStyle =
+            customTextColor || (hasFill && lum > 0.68 ? '#0a0a0a' : '#ffffff');
+          ctx.shadowColor =
+            hasFill && lum > 0.68 ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.65)';
+          ctx.shadowBlur = 3;
+        }
+
+        wrappedLines.forEach((line, idx) => {
+          ctx.fillText(line, centerX, Math.round(startY + idx * lineHeight));
+        });
+        ctx.restore();
       }
     }
   } else if (obj.type === 'text') {
@@ -702,6 +816,10 @@ export const HybridCanvas: React.FC<HybridCanvasProps> = ({
   } | null>(null);
   const [previewHoverObjectId, setPreviewHoverObjectId] = useState<string | null>(null);
   const [previewActiveObjectId, setPreviewActiveObjectId] = useState<string | null>(null);
+  const [editingNodeText, setEditingNodeText] = useState<{
+    objectId: string;
+    value: string;
+  } | null>(null);
 
   const isPreviewMode = gridSettings.canvasViewMode === 'preview';
   const isSliceMode = gridSettings.canvasViewMode === 'slice';
@@ -1536,9 +1654,9 @@ export const HybridCanvas: React.FC<HybridCanvasProps> = ({
 
     // Lucidchart-Style Magnetic Connection Port Dragging (from Pointer, AutoShape, or Smart Connector Tool)
     if (
-      activeTool === 'pointer' ||
       activeTool === 'connector' ||
-      activeTool === 'autoshape'
+      ((activeTool === 'pointer' || activeTool === 'autoshape') &&
+        gridSettings.autoConnectors !== false)
     ) {
       const hitPort = hitTestConnectionPort(rawX, rawY);
       if (hitPort) {
@@ -2208,6 +2326,56 @@ export const HybridCanvas: React.FC<HybridCanvasProps> = ({
 
     // Text Tool (T)
     if (activeTool === 'text') {
+      const connPad = 14 / Math.max(0.25, gridSettings.zoom);
+      const hitShape = [...objects]
+        .reverse()
+        .find((o) => {
+          if (!o.visible || o.locked) return false;
+          if (o.type === 'vector-path' && Boolean((o as VectorPathObject).connectorMeta)) {
+            return (
+              rawX >= o.x - connPad &&
+              rawX <= o.x + o.width + connPad &&
+              rawY >= o.y - connPad &&
+              rawY <= o.y + o.height + connPad
+            );
+          }
+          if (o.type === 'autoshape' || o.type === 'text' || o.type === 'vector-path') {
+            const pt = unrotatePointForObject(o, rawX, rawY);
+            return pt.x >= o.x && pt.x <= o.x + o.width && pt.y >= o.y && pt.y <= o.y + o.height;
+          }
+          return false;
+        });
+
+      if (hitShape) {
+        onSelectObjects([hitShape.id]);
+        onSelectTool('pointer');
+        onRecordHistorySnapshot();
+        if (hitShape.type === 'autoshape') {
+          const asObj = hitShape as AutoShapeObject;
+          const def = autoShapes.find((d) => d.id === asObj.shapeDefId) || autoShapes[0];
+          const currentText =
+            typeof asObj.params?.label === 'string'
+              ? asObj.params.label
+              : typeof asObj.params?.text === 'string'
+              ? asObj.params.text
+              : asObj.params?.label === undefined && typeof def?.defaultParams?.label === 'string'
+              ? String(def.defaultParams.label)
+              : '';
+          setEditingNodeText({ objectId: hitShape.id, value: currentText });
+        } else if (hitShape.type === 'text') {
+          setEditingNodeText({ objectId: hitShape.id, value: (hitShape as TextObject).text || '' });
+        } else if (hitShape.type === 'vector-path') {
+          const vecObj = hitShape as VectorPathObject;
+          const currentText = vecObj.connectorMeta
+            ? vecObj.connectorMeta.label || ''
+            : typeof vecObj.params?.label === 'string'
+            ? vecObj.params.label
+            : '';
+          setEditingNodeText({ objectId: hitShape.id, value: currentText });
+        }
+        return;
+      }
+
       onRecordHistorySnapshot();
       const newTxt: TextObject = {
         id: `txt-${Date.now()}`,
@@ -2240,6 +2408,7 @@ export const HybridCanvas: React.FC<HybridCanvasProps> = ({
       onAddObject(newTxt);
       onSelectObjects([newTxt.id]);
       onSelectTool('pointer');
+      setEditingNodeText({ objectId: newTxt.id, value: newTxt.text });
       return;
     }
 
@@ -2330,6 +2499,13 @@ export const HybridCanvas: React.FC<HybridCanvasProps> = ({
         };
       }
 
+      const prevSelectedSourceId =
+        activeTool === 'autoshape' &&
+        gridSettings.autoConnectors !== false &&
+        selectedIds.length === 1
+          ? selectedIds[0]
+          : undefined;
+
       onAddObject(createdObj);
       onSelectObjects([newId]);
       interactionRef.current = {
@@ -2341,6 +2517,7 @@ export const HybridCanvas: React.FC<HybridCanvasProps> = ({
         startClientX: e.clientX,
         startClientY: e.clientY,
         targetObjectId: newId,
+        autoConnectFromId: prevSelectedSourceId,
       };
     }
   };
@@ -3336,11 +3513,87 @@ export const HybridCanvas: React.FC<HybridCanvasProps> = ({
         onSelectTool('pointer');
       }
     } else if (drag.mode === 'draw-shape') {
+      if (
+        drag.autoConnectFromId &&
+        drag.targetObjectId &&
+        gridSettings.autoConnectors !== false &&
+        onConnectObjects
+      ) {
+        const sourceObj = objects.find((o) => o.id === drag.autoConnectFromId);
+        const targetObj = objects.find((o) => o.id === drag.targetObjectId);
+        if (
+          sourceObj &&
+          targetObj &&
+          sourceObj.id !== targetObj.id &&
+          targetObj.width >= 20 &&
+          targetObj.height >= 20 &&
+          !(sourceObj.type === 'vector-path' && (sourceObj as VectorPathObject).connectorMeta)
+        ) {
+          const bestPorts = computeBestPortPair(sourceObj, targetObj);
+          onConnectObjects(sourceObj.id, bestPorts.fromPort, targetObj.id, bestPorts.toPort);
+          onSelectObjects([targetObj.id]);
+        }
+      }
       onSelectTool('pointer');
     }
 
     interactionRef.current = null;
     setRenderTick((t) => t + 1);
+  };
+
+  // Double-Click on Canvas: Open Centered Textblock Inline Editor for Flowchart / Sitemap / Drone AutoShapes, Text Layers, Vector Shapes, or Connectors
+  const handleCanvasDoubleClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (isPreviewMode || isSliceMode) return;
+    const { rawX, rawY } = clientToCanvasCoords(e.clientX, e.clientY, false);
+    const connPad = 14 / Math.max(0.25, gridSettings.zoom);
+    const hit = [...objects]
+      .reverse()
+      .find((o) => {
+        if (!o.visible || o.locked) return false;
+        if (o.type === 'vector-path' && Boolean((o as VectorPathObject).connectorMeta)) {
+          return (
+            rawX >= o.x - connPad &&
+            rawX <= o.x + o.width + connPad &&
+            rawY >= o.y - connPad &&
+            rawY <= o.y + o.height + connPad
+          );
+        }
+        if (o.type === 'autoshape' || o.type === 'text' || o.type === 'vector-path') {
+          const pt = unrotatePointForObject(o, rawX, rawY);
+          return pt.x >= o.x && pt.x <= o.x + o.width && pt.y >= o.y && pt.y <= o.y + o.height;
+        }
+        return false;
+      });
+    if (!hit) return;
+
+    onSelectObjects([hit.id]);
+    if (hit.type === 'autoshape') {
+      const asObj = hit as AutoShapeObject;
+      const def = autoShapes.find((d) => d.id === asObj.shapeDefId) || autoShapes[0];
+      const currentText =
+        typeof asObj.params?.label === 'string'
+          ? asObj.params.label
+          : typeof asObj.params?.text === 'string'
+          ? asObj.params.text
+          : asObj.params?.label === undefined && typeof def?.defaultParams?.label === 'string'
+          ? String(def.defaultParams.label)
+          : '';
+      onRecordHistorySnapshot();
+      setEditingNodeText({ objectId: hit.id, value: currentText });
+    } else if (hit.type === 'text') {
+      const txtObj = hit as TextObject;
+      onRecordHistorySnapshot();
+      setEditingNodeText({ objectId: hit.id, value: txtObj.text || '' });
+    } else if (hit.type === 'vector-path') {
+      const vecObj = hit as VectorPathObject;
+      onRecordHistorySnapshot();
+      const currentText = vecObj.connectorMeta
+        ? vecObj.connectorMeta.label || ''
+        : typeof vecObj.params?.label === 'string'
+        ? vecObj.params.label
+        : '';
+      setEditingNodeText({ objectId: hit.id, value: currentText });
+    }
   };
 
   // Mouse Wheel Zoom / Pan
@@ -4336,9 +4589,10 @@ export const HybridCanvas: React.FC<HybridCanvasProps> = ({
         const showPortsForObject =
           activeTool === 'connector' ||
           isDrawingConnector ||
-          selectedIds.includes(obj.id) ||
-          hoveredObjectId === obj.id ||
-          hoveredPort?.objectId === obj.id;
+          (gridSettings.autoConnectors !== false &&
+            (selectedIds.includes(obj.id) ||
+              hoveredObjectId === obj.id ||
+              hoveredPort?.objectId === obj.id));
 
         if (!showPortsForObject) return;
 
@@ -4463,7 +4717,7 @@ export const HybridCanvas: React.FC<HybridCanvasProps> = ({
             drag.fromPort,
             { x: endX, y: endY },
             endPort,
-            'elbow'
+            gridSettings.autoConnectorRouting || 'elbow'
           );
 
           ctx.save();
@@ -4767,6 +5021,58 @@ export const HybridCanvas: React.FC<HybridCanvasProps> = ({
     onUpdateGridSettings({ showSlices: true });
   };
 
+  const editingTargetObj = editingNodeText
+    ? objects.find((o) => o.id === editingNodeText.objectId)
+    : undefined;
+  const docOriginScreen = getDocOriginOnScreen();
+
+  const applyInlineNodeTextChange = (nextVal: string) => {
+    if (!editingNodeText) return;
+    setEditingNodeText({ ...editingNodeText, value: nextVal });
+    const target = objects.find((o) => o.id === editingNodeText.objectId);
+    if (!target) return;
+    if (target.type === 'autoshape') {
+      const asObj = target as AutoShapeObject;
+      onUpdateObject(
+        target.id,
+        {
+          params: {
+            ...(asObj.params || {}),
+            label: nextVal,
+          },
+        } as Partial<AutoShapeObject>,
+        false
+      );
+    } else if (target.type === 'text') {
+      onUpdateObject(target.id, { text: nextVal } as Partial<TextObject>, false);
+    } else if (target.type === 'vector-path') {
+      const vecObj = target as VectorPathObject;
+      if (vecObj.connectorMeta) {
+        onUpdateObject(
+          target.id,
+          {
+            connectorMeta: {
+              ...vecObj.connectorMeta,
+              label: nextVal,
+            },
+          } as Partial<VectorPathObject>,
+          false
+        );
+      } else {
+        onUpdateObject(
+          target.id,
+          {
+            params: {
+              ...(vecObj.params || {}),
+              label: nextVal,
+            },
+          } as Partial<VectorPathObject>,
+          false
+        );
+      }
+    }
+  };
+
   return (
     <div
       ref={containerRef}
@@ -4774,12 +5080,91 @@ export const HybridCanvas: React.FC<HybridCanvasProps> = ({
     >
       <canvas
         ref={viewportCanvasRef}
-        onMouseDown={handleMouseDown}
+        onMouseDown={(e) => {
+          if (editingNodeText) {
+            setEditingNodeText(null);
+          }
+          handleMouseDown(e);
+        }}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
+        onDoubleClick={handleCanvasDoubleClick}
         onWheel={handleWheel}
         className={`w-full h-full block rounded-none ${getCursorStyle()}`}
       />
+
+      {/* Centered Inline Textblock Editor Overlay on Double-Clicked Flowchart / Sitemap / Drone AutoShape */}
+      {editingNodeText && editingTargetObj && (
+        <div
+          style={{
+            left: Math.max(
+              96,
+              Math.min(
+                Math.max(180, viewportSize.width - 96),
+                Math.round(
+                  docOriginScreen.originX +
+                    (editingTargetObj.x + editingTargetObj.width / 2) * gridSettings.zoom
+                )
+              )
+            ),
+            top: Math.max(
+              48,
+              Math.min(
+                Math.max(96, viewportSize.height - 48),
+                Math.round(
+                  docOriginScreen.originY +
+                    (editingTargetObj.y + editingTargetObj.height / 2) * gridSettings.zoom
+                )
+              )
+            ),
+            minWidth: Math.max(
+              160,
+              Math.min(340, Math.round(editingTargetObj.width * gridSettings.zoom))
+            ),
+          }}
+          className="absolute -translate-x-1/2 -translate-y-1/2 z-50 bg-[#0d1322]/95 border-2 border-[#38bdf8] shadow-2xl p-1.5 flex flex-col gap-1"
+          onMouseDown={(e) => e.stopPropagation()}
+        >
+          <div className="flex items-center justify-between gap-2 text-[9px] font-mono text-[#38bdf8] uppercase tracking-wider px-1">
+            <span>Centered Shape Text</span>
+            <div className="flex items-center gap-1.5">
+              {editingNodeText.value.length > 0 && (
+                <button
+                  type="button"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    applyInlineNodeTextChange('');
+                  }}
+                  className="px-1 py-0.5 bg-[#1e293b] hover:bg-[#334155] text-[#f8fafc] border border-[#475569] text-[8px] font-semibold"
+                  title="Clear centered node text"
+                >
+                  Clear
+                </button>
+              )}
+              <span>Enter = Done • Shift+Enter = Line</span>
+            </div>
+          </div>
+          <textarea
+            autoFocus
+            rows={Math.min(4, Math.max(1, editingNodeText.value.split('\n').length))}
+            value={editingNodeText.value}
+            onChange={(e) => applyInlineNodeTextChange(e.target.value)}
+            onKeyDown={(e) => {
+              e.stopPropagation();
+              if (e.key === 'Escape') {
+                setEditingNodeText(null);
+              } else if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                setEditingNodeText(null);
+              }
+            }}
+            onBlur={() => setEditingNodeText(null)}
+            placeholder="Enter centered node text..."
+            className="w-full bg-[#111827] border border-[#334155] px-2 py-1 text-center text-xs font-semibold text-[#f8fafc] focus:outline-none focus:border-[#38bdf8] resize-none leading-snug"
+          />
+        </div>
+      )}
 
       {/* Live Constrained vs Free Skew Resize HUD Banner */}
       {resizeHudLabel && (
@@ -4854,6 +5239,21 @@ export const HybridCanvas: React.FC<HybridCanvasProps> = ({
           Grid: {gridSettings.showMajorGrid ? 'ON' : 'OFF'}
         </button>
         <button
+          onClick={() =>
+            onUpdateGridSettings({
+              autoConnectors: gridSettings.autoConnectors === false ? true : false,
+            })
+          }
+          className={`px-1.5 py-0.5 rounded-none text-[10px] border ${
+            gridSettings.autoConnectors !== false
+              ? 'bg-[#0c2a3d] text-[#38bdf8] border-[#0284c7] font-semibold'
+              : 'border-[#262626] text-[#737373] hover:bg-[#1f1f1f]'
+          }`}
+          title="Toggle Magnetic Auto-Connectors (N/E/S/W ports & auto-linking new Flowchart/Sitemap/Drone shapes)"
+        >
+          Auto-Connect: {gridSettings.autoConnectors !== false ? 'ON' : 'OFF'}
+        </button>
+        <button
           onClick={cycleCanvasBackdrop}
           className="px-1.5 py-0.5 rounded-none text-[10px] border bg-[#1d1d1d] text-[#ffffff] border-[#525252] hover:bg-[#2a2a2a]"
           title="Cycle Eye-Safe Canvas Backdrop: Solid Matte Dark (#141414) → Checker → Light"
@@ -4876,7 +5276,7 @@ export const HybridCanvas: React.FC<HybridCanvasProps> = ({
             <>
               {activeTool === 'pointer' && (
                 <span>
-                  <strong className="text-white">Pointer (V):</strong> Drag handles to resize, drag{' '}
+                  <strong className="text-white">Pointer (V):</strong> Double-click any shape to edit centered text • Drag{' '}
                   <span className="text-white font-semibold">◆ handles</span> on AutoShapes, or drag any{' '}
                   <span className="text-[#38bdf8] font-semibold">● N/E/S/W port</span> to auto-connect workflows!
                 </span>
@@ -4910,7 +5310,7 @@ export const HybridCanvas: React.FC<HybridCanvasProps> = ({
               {activeTool === 'autoshape' && (
                 <span>
                   <strong className="text-white">JS AutoShape:</strong> Drag on canvas to draw{' '}
-                  <span className="text-white font-semibold">{toolOptions.activeAutoShapeId}</span>, then drag its ◆ handles or{' '}
+                  <span className="text-white font-semibold">{toolOptions.activeAutoShapeId}</span> • Double-click shape to edit centered text, or drag{' '}
                   <span className="text-[#38bdf8] font-semibold">● ports</span> to connect!
                 </span>
               )}

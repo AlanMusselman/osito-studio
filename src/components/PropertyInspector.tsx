@@ -1393,18 +1393,98 @@ export const PropertyInspector: React.FC<PropertyInspectorProps> = ({
 
   const renderAutoShapeInspector = (obj: AutoShapeObject) => {
     const def = autoShapes.find((s) => s.id === obj.shapeDefId);
+    const currentLabel =
+      typeof obj.params?.label === 'string'
+        ? obj.params.label
+        : typeof obj.params?.text === 'string'
+        ? obj.params.text
+        : obj.params?.label === undefined && typeof def?.defaultParams?.label === 'string'
+        ? String(def.defaultParams.label)
+        : '';
+    const currentFontSize = Number.isFinite(Number(obj.params?.fontSize))
+      ? Number(obj.params?.fontSize)
+      : 12;
+
     return (
       <div className="flex flex-col gap-2 w-full">
         {renderCommonTransformAndStyle(obj)}
 
-        {/* Row 2: Dynamic JS AutoShape Parameters + Actions */}
+        {/* Row 2: Centered Flowchart/Sitemap/Drone Textblock + Dynamic JS AutoShape Parameters + Actions */}
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
+            {/* Centered Node Textblock Input */}
+            <label
+              className="flex items-center gap-1.5 text-[11px] font-mono text-[#d4d4d4] bg-[#0a0a0a] px-2 py-0.5 rounded-none border border-[#38bdf8]/70"
+              title="Centered textblock inside this AutoShape (or double-click the shape on canvas to edit inline)"
+            >
+              <span className="text-[#38bdf8] font-semibold">Node Text:</span>
+              <input
+                type="text"
+                value={currentLabel}
+                placeholder="Centered shape label..."
+                onFocus={() => onRecordHistorySnapshot?.()}
+                onChange={(e) => {
+                  onUpdateObject(
+                    obj.id,
+                    {
+                      params: {
+                        ...obj.params,
+                        label: e.target.value,
+                      },
+                    } as Partial<AutoShapeObject>,
+                    false
+                  );
+                }}
+                className="w-36 bg-[#141414] border border-[#333333] px-1.5 py-0.5 text-[11px] font-sans text-[#ffffff] focus:outline-none focus:border-[#38bdf8]"
+              />
+              {currentLabel && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    onUpdateObject(obj.id, {
+                      params: {
+                        ...obj.params,
+                        label: '',
+                      },
+                    } as Partial<AutoShapeObject>)
+                  }
+                  title="Clear centered shape text"
+                  className="text-[10px] text-[#a3a3a3] hover:text-[#ffffff] px-1"
+                >
+                  ✕
+                </button>
+              )}
+              <input
+                type="number"
+                min={8}
+                max={48}
+                value={currentFontSize}
+                title="Centered node text font size (px)"
+                onFocus={() => onRecordHistorySnapshot?.()}
+                onChange={(e) => {
+                  const fs = Math.max(8, Math.min(48, parseInt(e.target.value, 10) || 12));
+                  onUpdateObject(
+                    obj.id,
+                    {
+                      params: {
+                        ...obj.params,
+                        fontSize: fs,
+                      },
+                    } as Partial<AutoShapeObject>,
+                    false
+                  );
+                }}
+                className="w-11 bg-[#141414] border border-[#333333] px-1 py-0.5 text-[10px] font-mono text-[#ffffff] text-right"
+              />
+              <span className="text-[9px] text-[#737373]">px</span>
+            </label>
+
             <span className="text-[10px] font-mono uppercase text-[#e5e5e5] flex items-center gap-1">
               <span>JS Params:</span>
             </span>
 
             {def?.paramSchema.map((param) => {
+              if (param.key === 'label') return null;
               const currentVal = obj.params[param.key] ?? param.defaultValue;
               if (param.type === 'number') {
                 return (
@@ -1465,18 +1545,79 @@ export const PropertyInspector: React.FC<PropertyInspectorProps> = ({
                   </button>
                 );
               }
+              if (param.type === 'string') {
+                return (
+                  <label
+                    key={param.key}
+                    className="flex items-center gap-1.5 text-[11px] font-mono text-[#d4d4d4] bg-[#0a0a0a] px-2 py-0.5 rounded-none border border-[#2e2e2e]"
+                  >
+                    <span className="text-[#e5e5e5]">{param.label}</span>
+                    <input
+                      type="text"
+                      value={String(currentVal ?? '')}
+                      onFocus={() => onRecordHistorySnapshot?.()}
+                      onChange={(e) =>
+                        onUpdateObject(
+                          obj.id,
+                          {
+                            params: {
+                              ...obj.params,
+                              [param.key]: e.target.value,
+                            },
+                          } as Partial<AutoShapeObject>,
+                          false
+                        )
+                      }
+                      className="w-28 bg-[#141414] border border-[#333333] px-1.5 py-0.5 text-[11px] text-[#ffffff]"
+                    />
+                  </label>
+                );
+              }
               return null;
             })}
           </div>
 
           {/* Action Buttons */}
           <div className="flex flex-wrap items-center gap-1.5">
+            {/* Auto-Connector Toggle & Routing Selector */}
+            <button
+              type="button"
+              onClick={() =>
+                onUpdateGridSettings({
+                  autoConnectors: gridSettings.autoConnectors === false ? true : false,
+                })
+              }
+              title="Enable or disable magnetic N/E/S/W Auto-Connector ports and automatic flowchart/sitemap node linking"
+              className={`px-2 py-1 rounded-none text-[10px] font-mono border transition-all ${
+                gridSettings.autoConnectors !== false
+                  ? 'bg-[#0c2a3d] border-[#0284c7] text-[#38bdf8] font-semibold'
+                  : 'bg-[#141414] border-[#333333] text-[#737373] hover:text-[#d4d4d4]'
+              }`}
+            >
+              Auto-Connect: {gridSettings.autoConnectors !== false ? 'ON' : 'OFF'}
+            </button>
+
+            <select
+              value={gridSettings.autoConnectorRouting || 'elbow'}
+              onChange={(e) =>
+                onUpdateGridSettings({
+                  autoConnectorRouting: e.target.value as 'elbow' | 'curved' | 'straight',
+                })
+              }
+              title="Default routing style for Auto-Connectors"
+              className="bg-[#141414] border border-[#404040] px-1.5 py-1 text-[10px] font-mono text-[#e5e5e5] rounded-none"
+            >
+              <option value="elbow">Route: Elbow</option>
+              <option value="curved">Route: Curved</option>
+              <option value="straight">Route: Straight</option>
+            </select>
+
             {onBranchConnectedNode && (
               <>
                 <button
                   type="button"
                   onClick={() => onBranchConnectedNode(obj.id, 'e')}
-                  title="Lucidchart Quick Branch: Spawn a connected child Sitemap/Workflow node to the right"
+                  title="Quick Branch: Spawn a connected child Sitemap/Workflow node to the right"
                   className="px-2 py-1 rounded-none text-[11px] font-mono bg-[#1a1a1a] hover:bg-[#e5e5e5] text-[#e5e5e5] hover:text-[#0a0a0a] border border-[#525252] flex items-center gap-1 transition-all"
                 >
                   <span>+ Branch Right →</span>
@@ -1484,7 +1625,7 @@ export const PropertyInspector: React.FC<PropertyInspectorProps> = ({
                 <button
                   type="button"
                   onClick={() => onBranchConnectedNode(obj.id, 's')}
-                  title="Lucidchart Quick Branch: Spawn a connected child Sitemap/Workflow node below"
+                  title="Quick Branch: Spawn a connected child Sitemap/Workflow node below"
                   className="px-2 py-1 rounded-none text-[11px] font-mono bg-[#1a1a1a] hover:bg-[#e5e5e5] text-[#e5e5e5] hover:text-[#0a0a0a] border border-[#525252] flex items-center gap-1 transition-all"
                 >
                   <span>+ Branch Down ↓</span>
@@ -1677,6 +1818,23 @@ export const PropertyInspector: React.FC<PropertyInspectorProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
+            <label className="flex items-center gap-1 text-[10px] font-mono text-[#38bdf8] bg-[#0c1928] border border-[#0284c7] px-1.5 py-0.5 rounded-none">
+              <span className="font-bold uppercase">Node Text:</span>
+              <input
+                type="text"
+                value={typeof obj.params?.label === 'string' ? obj.params.label : ''}
+                placeholder="Centered shape text..."
+                onChange={(e) =>
+                  onUpdateObject(obj.id, {
+                    params: {
+                      ...(obj.params || {}),
+                      label: e.target.value,
+                    },
+                  } as Partial<VectorPathObject>)
+                }
+                className="w-32 bg-[#0a0a0a] border border-[#1e293b] rounded-none px-1.5 py-0.5 text-[11px] font-sans text-[#ffffff] focus:outline-none focus:border-[#38bdf8]"
+              />
+            </label>
             {onBranchConnectedNode && (
               <>
                 <button
@@ -2602,6 +2760,38 @@ export const PropertyInspector: React.FC<PropertyInspectorProps> = ({
             >
               Smart Guides
             </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                onUpdateGridSettings({
+                  autoConnectors: gridSettings.autoConnectors === false ? true : false,
+                })
+              }
+              title="Enable or disable magnetic N/E/S/W Auto-Connector ports and automatic Flowchart/Sitemap/Drone node linking"
+              className={`px-2 py-0.5 rounded-none text-[10px] font-mono border transition-colors ${
+                gridSettings.autoConnectors !== false
+                  ? 'bg-[#0c2a3d] border-[#0284c7] text-[#38bdf8] font-semibold'
+                  : 'bg-[#0a0a0a] border-[#2e2e2e] text-[#a3a3a3]'
+              }`}
+            >
+              Auto-Connect: {gridSettings.autoConnectors !== false ? 'ON' : 'OFF'}
+            </button>
+
+            <select
+              value={gridSettings.autoConnectorRouting || 'elbow'}
+              onChange={(e) =>
+                onUpdateGridSettings({
+                  autoConnectorRouting: e.target.value as 'elbow' | 'curved' | 'straight',
+                })
+              }
+              title="Default routing style for Auto-Connectors"
+              className="bg-[#0a0a0a] border border-[#2e2e2e] px-1.5 py-0.5 text-[10px] font-mono text-[#e5e5e5] rounded-none"
+            >
+              <option value="elbow">Route: Elbow</option>
+              <option value="curved">Route: Curved</option>
+              <option value="straight">Route: Straight</option>
+            </select>
 
             <div className="h-4 w-[1px] bg-[#2e2e2e]" />
 

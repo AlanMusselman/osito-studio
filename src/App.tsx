@@ -75,6 +75,7 @@ import {
   vectorizeBitmapSelectionToBezier,
 } from './engine/bitmapEngine';
 import {
+  buildSliceSvgMarkup,
   createDefaultStarterSlices,
   exportFullReactTailwindAppZip,
   exportSlicesToMultiScaleZip,
@@ -200,6 +201,8 @@ export const App: React.FC = () => {
     snapToGrid: false,
     snapToPixel: true,
     snapToObjects: true,
+    autoConnectors: true,
+    autoConnectorRouting: 'elbow',
     showRulers: true,
     showSlices: false,
     showToolHints: true,
@@ -424,7 +427,7 @@ export const App: React.FC = () => {
 
       recordHistorySnapshot();
       const connector = createSmartConnectorObject(fromObj, fromPort, toObj, toPort, {
-        routing: 'elbow',
+        routing: gridSettings.autoConnectorRouting || 'elbow',
         stroke: toolOptions.secondaryColor || '#38bdf8',
         strokeWidth: 2,
       });
@@ -434,7 +437,7 @@ export const App: React.FC = () => {
         `Connected "${fromObj.name}" (${fromPort.toUpperCase()}) → "${toObj.name}" (${toPort.toUpperCase()})`
       );
     },
-    [objects, toolOptions.secondaryColor, recordHistorySnapshot, showToast]
+    [objects, gridSettings.autoConnectorRouting, toolOptions.secondaryColor, recordHistorySnapshot, showToast]
   );
 
   const handleSpawnConnectedNode = useCallback(
@@ -450,14 +453,11 @@ export const App: React.FC = () => {
       recordHistorySnapshot();
 
       const isSourceAutoShape = fromObj.type === 'autoshape';
+      const sourceShapeId = isSourceAutoShape ? (fromObj as AutoShapeObject).shapeDefId : 'sitemap-node';
+      const targetShapeId =
+        sourceShapeId === 'flow-terminator-pill' ? 'flow-process-step' : sourceShapeId;
       const defaultSitemapDef =
-        allAutoShapes.find(
-          (d) =>
-            d.id ===
-            (isSourceAutoShape
-              ? (fromObj as AutoShapeObject).shapeDefId
-              : 'sitemap-node')
-        ) ||
+        allAutoShapes.find((d) => d.id === targetShapeId) ||
         allAutoShapes.find((d) => d.id === 'sitemap-node') ||
         allAutoShapes[0];
 
@@ -480,6 +480,17 @@ export const App: React.FC = () => {
         ny = Math.round(canvasY - nh);
         toPort = 's';
       }
+
+      const spawnedParams: Record<string, number | boolean | string> = isSourceAutoShape &&
+        targetShapeId === sourceShapeId
+        ? {
+            ...(fromObj as AutoShapeObject).params,
+            label:
+              typeof defaultSitemapDef.defaultParams.label === 'string'
+                ? defaultSitemapDef.defaultParams.label
+                : `${defaultSitemapDef.name.replace(/^(Sitemap|Flowchart|Flow|Drone|Drone Part):\s*/i, '')}`,
+          }
+        : { ...defaultSitemapDef.defaultParams };
 
       const spawnedNode: AutoShapeObject = {
         id: `autoshape-node-${Date.now()}`,
@@ -515,13 +526,11 @@ export const App: React.FC = () => {
           offsetX: 0,
           offsetY: 4,
         },
-        params: isSourceAutoShape
-          ? { ...(fromObj as AutoShapeObject).params }
-          : { ...defaultSitemapDef.defaultParams },
+        params: spawnedParams,
       };
 
       const connector = createSmartConnectorObject(fromObj, fromPort, spawnedNode, toPort, {
-        routing: 'elbow',
+        routing: gridSettings.autoConnectorRouting || 'elbow',
         stroke:
           fromObj.stroke && fromObj.stroke !== 'none'
             ? fromObj.stroke
@@ -536,7 +545,15 @@ export const App: React.FC = () => {
         `Auto-spawned & linked "${spawnedNode.name}" — move either node to see live auto-routing!`
       );
     },
-    [objects, allAutoShapes, toolOptions.primaryColor, toolOptions.secondaryColor, recordHistorySnapshot, showToast]
+    [
+      objects,
+      allAutoShapes,
+      gridSettings.autoConnectorRouting,
+      toolOptions.primaryColor,
+      toolOptions.secondaryColor,
+      recordHistorySnapshot,
+      showToast,
+    ]
   );
 
   const handleBranchConnectedNode = useCallback(
@@ -699,7 +716,7 @@ export const App: React.FC = () => {
     [selectedIds, recordHistorySnapshot]
   );
 
-  // Insert a JS AutoShape directly onto the canvas (with non-overlapping placement for menus & containers)
+  // Insert a JS AutoShape directly onto the canvas (with non-overlapping placement & optional Auto-Connector linking)
   const handleInsertAutoShape = useCallback(
     (shapeDefId: string) => {
       const def = allAutoShapes.find((d) => d.id === shapeDefId) || allAutoShapes[0];
@@ -726,8 +743,57 @@ export const App: React.FC = () => {
         ? 18
         : Math.round(gridSettings.canvasHeight / 2 - defaultH / 2 + offset);
 
-      // Avoid overlapping any top navbar / mega-menu / dropdown container when spawning a normal shape
-      if (!isNavbarOrMegaMenu) {
+      const isFlowOrSitemapOrDrone =
+        def.category === 'Flow & Diagrams' ||
+        def.category === 'Drone Parts & Frames' ||
+        def.id.startsWith('sitemap-') ||
+        def.id.startsWith('flow-');
+
+      const sourceObjForAutoConnect =
+        gridSettings.autoConnectors !== false &&
+        !isNavbarOrMegaMenu &&
+        isFlowOrSitemapOrDrone &&
+        selectedIds.length === 1
+          ? objects.find(
+              (o) =>
+                o.id === selectedIds[0] &&
+                o.visible &&
+                !o.locked &&
+                o.type !== 'bitmap' &&
+                !(o.type === 'vector-path' && (o as VectorPathObject).connectorMeta)
+            )
+          : undefined;
+
+      let autoFromPort: ConnectionPortId = 'e';
+      let autoToPort: ConnectionPortId = 'w';
+
+      if (sourceObjForAutoConnect) {
+        const rightCandidateX = Math.round(sourceObjForAutoConnect.x + sourceObjForAutoConnect.width + 64);
+        const rightCandidateY = Math.round(
+          sourceObjForAutoConnect.y + (sourceObjForAutoConnect.height - defaultH) / 2
+        );
+        if (rightCandidateX + defaultW <= gridSettings.canvasWidth - 12) {
+          spawnX = rightCandidateX;
+          spawnY = Math.max(12, Math.min(gridSettings.canvasHeight - defaultH - 12, rightCandidateY));
+          autoFromPort = 'e';
+          autoToPort = 'w';
+        } else {
+          spawnX = Math.max(
+            12,
+            Math.min(
+              gridSettings.canvasWidth - defaultW - 12,
+              Math.round(sourceObjForAutoConnect.x + (sourceObjForAutoConnect.width - defaultW) / 2)
+            )
+          );
+          spawnY = Math.min(
+            Math.max(12, gridSettings.canvasHeight - defaultH - 12),
+            Math.round(sourceObjForAutoConnect.y + sourceObjForAutoConnect.height + 56)
+          );
+          autoFromPort = 's';
+          autoToPort = 'n';
+        }
+      } else if (!isNavbarOrMegaMenu) {
+        // Avoid overlapping any top navbar / mega-menu / dropdown container when spawning a normal shape
         const topMenus = objects.filter(
           (o) =>
             o.visible &&
@@ -782,9 +848,23 @@ export const App: React.FC = () => {
         params: { ...def.defaultParams },
       };
 
+      const autoConnectorObj = sourceObjForAutoConnect
+        ? createSmartConnectorObject(
+            sourceObjForAutoConnect,
+            autoFromPort,
+            newShape,
+            autoToPort,
+            {
+              routing: gridSettings.autoConnectorRouting || 'elbow',
+              stroke: toolOptions.secondaryColor || '#38bdf8',
+              strokeWidth: 2,
+            }
+          )
+        : null;
+
       setObjects((prev) => {
         if (!isNavbarOrMegaMenu) {
-          return [...prev, newShape];
+          return autoConnectorObj ? [...prev, newShape, autoConnectorObj] : [...prev, newShape];
         }
         // If inserting a top navbar or mega-menu, push down any containers that would be overlapped by it
         const menuBottom = spawnY + defaultH + 14;
@@ -804,9 +884,13 @@ export const App: React.FC = () => {
       setSelectedIds([newShape.id]);
       setToolOptions((prev) => ({ ...prev, activeAutoShapeId: def.id }));
       setActiveTool('pointer');
-      showToast(`Added "${def.name}" — drag its yellow ◆ handles or edit its JS code!`);
+      showToast(
+        autoConnectorObj
+          ? `Added & auto-connected "${def.name}" — double-click shape to edit centered text!`
+          : `Added "${def.name}" — double-click to edit text or drag yellow ◆ handles!`
+      );
     },
-    [allAutoShapes, objects, gridSettings, toolOptions, recordHistorySnapshot, showToast]
+    [allAutoShapes, objects, selectedIds, gridSettings, toolOptions, recordHistorySnapshot, showToast]
   );
 
   // Convert JS AutoShape to Editable Cubic Bezier Vector Path
@@ -1867,64 +1951,21 @@ export const App: React.FC = () => {
   }, [handleExportRaster]);
 
   const buildSvgString = useCallback(() => {
-    const escapeXml = (raw: string | number | undefined | null): string =>
-      String(raw ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&apos;');
-
-    const nodesToSvgD = (nodes: VectorPathObject['nodes'], closed: boolean, ox: number, oy: number) => {
-      if (nodes.length === 0) return '';
-      let d = `M ${nodes[0].x + ox} ${nodes[0].y + oy}`;
-      for (let i = 0; i < nodes.length - 1; i++) {
-        const c = nodes[i];
-        const n = nodes[i + 1];
-        d += ` C ${c.cp2x + ox} ${c.cp2y + oy}, ${n.cp1x + ox} ${n.cp1y + oy}, ${n.x + ox} ${n.y + oy}`;
-      }
-      if (closed && nodes.length > 1) {
-        const last = nodes[nodes.length - 1];
-        const first = nodes[0];
-        d += ` C ${last.cp2x + ox} ${last.cp2y + oy}, ${first.cp1x + ox} ${first.cp1y + oy}, ${first.x + ox} ${first.y + oy} Z`;
-      }
-      return d;
-    };
-
-    const parts: string[] = [
-      `<svg xmlns="http://www.w3.org/2000/svg" width="${gridSettings.canvasWidth}" height="${gridSettings.canvasHeight}" viewBox="0 0 ${gridSettings.canvasWidth} ${gridSettings.canvasHeight}">`,
-    ];
-
-    objects.forEach((obj) => {
-      if (!obj.visible) return;
-      if (obj.type === 'vector-path') {
-        const d = nodesToSvgD(obj.nodes, obj.closed, obj.x, obj.y);
-        parts.push(
-          `  <path d="${escapeXml(d)}" fill="${escapeXml(obj.fillType === 'none' ? 'none' : obj.fill)}" stroke="${escapeXml(obj.stroke)}" stroke-width="${obj.strokeWidth}" opacity="${obj.opacity}" />`
-        );
-      } else if (obj.type === 'autoshape') {
-        const def = allAutoShapes.find((s) => s.id === obj.shapeDefId) || allAutoShapes[0];
-        if (def) {
-          const ev = evaluateAutoShape(def, obj.width, obj.height, obj.params, obj.customCode);
-          const d = ev.paths.map((p) => nodesToSvgD(p.nodes, p.closed, obj.x, obj.y)).join(' ');
-          parts.push(
-            `  <path d="${escapeXml(d)}" fill="${escapeXml(obj.fillType === 'none' ? 'none' : obj.fill)}" stroke="${escapeXml(obj.stroke)}" stroke-width="${obj.strokeWidth}" opacity="${obj.opacity}" />`
-          );
-        }
-      } else if (obj.type === 'bitmap') {
-        parts.push(
-          `  <image x="${obj.x}" y="${obj.y}" width="${obj.width}" height="${obj.height}" href="${escapeXml(obj.imageDataUrl)}" opacity="${obj.opacity}" />`
-        );
-      } else if (obj.type === 'text') {
-        parts.push(
-          `  <text x="${obj.x}" y="${obj.y + obj.fontSize}" fill="${escapeXml(obj.fill)}" font-family="${escapeXml(obj.fontFamily)}" font-size="${obj.fontSize}" font-weight="${escapeXml(obj.fontWeight)}">${escapeXml(obj.text)}</text>`
-        );
-      }
-    });
-
-    parts.push('</svg>');
-    return parts.join('\n');
-  }, [gridSettings, objects, allAutoShapes]);
+    return buildSliceSvgMarkup(
+      {
+        id: 'full-canvas',
+        name: 'canvas',
+        x: 0,
+        y: 0,
+        width: gridSettings.canvasWidth,
+        height: gridSettings.canvasHeight,
+        formats: ['svg'],
+        scales: [1],
+      },
+      objects,
+      allAutoShapes
+    );
+  }, [gridSettings.canvasWidth, gridSettings.canvasHeight, objects, allAutoShapes]);
 
   const handleExportSvg = useCallback(() => {
     const svgContent = buildSvgString();
@@ -4651,6 +4692,43 @@ export const App: React.FC = () => {
                       </button>
                     </div>
 
+                    {/* Auto-Connectors Toggle & Default Routing Style */}
+                    <div className="flex items-center justify-between pt-1 gap-2">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setGridSettings((prev) => ({
+                            ...prev,
+                            autoConnectors: prev.autoConnectors === false ? true : false,
+                          }))
+                        }
+                        className={`flex-1 px-2 py-1.5 border text-center transition text-[10px] ${
+                          gridSettings.autoConnectors !== false
+                            ? 'bg-[#0c2a3d] text-[#38bdf8] border-[#0284c7] font-bold'
+                            : 'bg-[#181818] text-[#737373] border-[#333333]'
+                        }`}
+                        title="Toggle Magnetic N/E/S/W Auto-Connector ports & automatic Flowchart/Sitemap/Drone shape linking"
+                      >
+                        Auto-Connectors: {gridSettings.autoConnectors !== false ? 'ON' : 'OFF'}
+                      </button>
+
+                      <select
+                        value={gridSettings.autoConnectorRouting || 'elbow'}
+                        onChange={(e) =>
+                          setGridSettings((prev) => ({
+                            ...prev,
+                            autoConnectorRouting: e.target.value as 'elbow' | 'curved' | 'straight',
+                          }))
+                        }
+                        className="bg-[#181818] border border-[#383838] px-2 py-1.5 text-[10px] text-[#e5e5e5]"
+                        title="Default Auto-Connector Routing Style"
+                      >
+                        <option value="elbow">Route: Elbow</option>
+                        <option value="curved">Route: Curved</option>
+                        <option value="straight">Route: Straight</option>
+                      </select>
+                    </div>
+
                     <div className="flex items-center justify-between pt-1">
                       <span className="text-[10px] text-[#d4d4d4]">Grid Spacing Size:</span>
                       <div className="flex items-center gap-1">
@@ -4911,6 +4989,8 @@ export const App: React.FC = () => {
                           snapToGrid: false,
                           snapToPixel: true,
                           snapToObjects: true,
+                          autoConnectors: true,
+                          autoConnectorRouting: 'elbow',
                           showRulers: true,
                           showSlices: false,
                           showToolHints: true,
