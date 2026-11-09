@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { AutoShapeDefinition, BezierNode } from '../types/editor';
+import type { AutoShapeDefinition, BezierNode } from '../types/editor';
 import { evaluateAutoShape } from '../engine/autoshapes';
 
 export interface AutoShapeThumbnailProps {
@@ -34,6 +34,15 @@ function bezierNodesToSvgD(nodes: BezierNode[], closed: boolean, padX = 0, padY 
   return cmds.join(' ');
 }
 
+interface CachedPreviewData {
+  pathEntries: Array<{ d: string; closed: boolean; isOuter: boolean }>;
+  controlPts: Array<{ x: number; y: number }>;
+  viewW: number;
+  viewH: number;
+}
+
+const thumbnailPreviewCache = new Map<string, CachedPreviewData>();
+
 export const AutoShapeThumbnail: React.FC<AutoShapeThumbnailProps> = ({
   shape,
   width = 56,
@@ -47,6 +56,11 @@ export const AutoShapeThumbnail: React.FC<AutoShapeThumbnailProps> = ({
   const refH = Math.max(110, Math.round((height / Math.max(1, width)) * refW));
 
   const previewData = useMemo(() => {
+    const cacheKey = shape.isBuiltIn ? `${shape.id}:${refW}:${refH}` : '';
+    if (cacheKey) {
+      const hit = thumbnailPreviewCache.get(cacheKey);
+      if (hit) return hit;
+    }
     try {
       const evaluated = evaluateAutoShape(shape, refW, refH, shape.defaultParams);
       let minX = 0;
@@ -84,7 +98,11 @@ export const AutoShapeThumbnail: React.FC<AutoShapeThumbnailProps> = ({
         x: Math.max(6, Math.min(viewW - 6, cp.x + offsetX)),
         y: Math.max(6, Math.min(viewH - 6, cp.y + offsetY)),
       }));
-      return { pathEntries, controlPts, viewW, viewH };
+      const computed: CachedPreviewData = { pathEntries, controlPts, viewW, viewH };
+      if (cacheKey) {
+        thumbnailPreviewCache.set(cacheKey, computed);
+      }
+      return computed;
     } catch {
       return {
         pathEntries: [],

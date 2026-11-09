@@ -36,6 +36,12 @@ export interface AutoShapeHelpers {
   rectPath: (x: number, y: number, w: number, h: number, r?: number) => BezierNode[];
   ellipsePath: (cx: number, cy: number, rx: number, ry: number) => BezierNode[];
   polygonPath: (points: Array<{ x: number; y: number }>, closed?: boolean) => BezierNode[];
+  rect: (x: number, y: number, w: number, h: number) => BezierNode[];
+  roundRect: (x: number, y: number, w: number, h: number, r?: number) => BezierNode[];
+  circle: (cx: number, cy: number, r: number) => BezierNode[];
+  ellipse: (cx: number, cy: number, rx: number, ry: number) => BezierNode[];
+  line: (x1: number, y1: number, x2: number, y2: number) => BezierNode[];
+  polygon: (points: Array<[number, number] | { x: number; y: number }>) => BezierNode[];
   arcNodes: (
     cx: number,
     cy: number,
@@ -174,6 +180,32 @@ export function createAutoShapeHelpers(): AutoShapeHelpers {
     return points.map((pt, idx) => cornerNode(pt.x, pt.y, nextId(`poly_${idx}`)));
   };
 
+  const rect = (x: number, y: number, w: number, h: number): BezierNode[] =>
+    rectPath(x, y, w, h, 0);
+
+  const roundRect = (x: number, y: number, w: number, h: number, r = 0): BezierNode[] =>
+    rectPath(x, y, w, h, r);
+
+  const circle = (cx: number, cy: number, r: number): BezierNode[] =>
+    ellipsePath(cx, cy, r, r);
+
+  const ellipse = (cx: number, cy: number, rx: number, ry: number): BezierNode[] =>
+    ellipsePath(cx, cy, rx, ry);
+
+  const line = (x1: number, y1: number, x2: number, y2: number): BezierNode[] => [
+    cornerNode(x1, y1, nextId('ln_a')),
+    cornerNode(x2, y2, nextId('ln_b')),
+  ];
+
+  const polygon = (
+    points: Array<[number, number] | { x: number; y: number }>
+  ): BezierNode[] =>
+    points.map((pt, idx) =>
+      Array.isArray(pt)
+        ? cornerNode(pt[0], pt[1], nextId(`poly_${idx}`))
+        : cornerNode(pt.x, pt.y, nextId(`poly_${idx}`))
+    );
+
   /**
    * Approximates an elliptical arc of arbitrary sweep angle using cubic Bezier segments
    * (max 90 deg per segment).
@@ -221,6 +253,12 @@ export function createAutoShapeHelpers(): AutoShapeHelpers {
     rectPath,
     ellipsePath,
     polygonPath,
+    rect,
+    roundRect,
+    circle,
+    ellipse,
+    line,
+    polygon,
     arcNodes,
     clamp,
     degToRad,
@@ -2951,11 +2989,152 @@ export function saveCustomAutoShapes(defs: AutoShapeDefinition[]): void {
 }
 
 /**
+ * Parses an SVG path string (supporting M, L, Q, C, A, Z commands) into BezierNode[]
+ * so AutoShape `.jsf` scripts can return either `{ nodes, closed }` or `{ d, closed }`.
+ */
+function parseSvgPathStringToNodes(
+  dStr: string,
+  defaultClosed: boolean,
+  helpers: AutoShapeHelpers
+): { nodes: BezierNode[]; closed: boolean } {
+  const tokens = dStr.match(/[MLQCAZmlqcaz]|[-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?/g);
+  if (!tokens || tokens.length === 0) {
+    return { nodes: [], closed: defaultClosed };
+  }
+
+  const nodes: BezierNode[] = [];
+  let closed = defaultClosed;
+  let i = 0;
+  let cmd = 'M';
+
+  const readNum = (): number => {
+    const val = Number(tokens[i++]);
+    return Number.isFinite(val) ? val : 0;
+  };
+
+  while (i < tokens.length) {
+    const tok = tokens[i];
+    if (/^[MLQCAZmlqcaz]$/.test(tok)) {
+      cmd = tok.toUpperCase();
+      i++;
+      if (cmd === 'Z') {
+        closed = true;
+        continue;
+      }
+    }
+
+    if (cmd === 'M' || cmd === 'L') {
+      const x = readNum();
+      const y = readNum();
+      nodes.push(helpers.cornerNode(x, y));
+      if (cmd === 'M') cmd = 'L';
+    } else if (cmd === 'Q') {
+      const cx = readNum();
+      const cy = readNum();
+      const x = readNum();
+      const y = readNum();
+      const prev = nodes[nodes.length - 1] || helpers.cornerNode(cx, cy);
+      prev.cp2x = prev.x + (2 / 3) * (cx - prev.x);
+      prev.cp2y = prev.y + (2 / 3) * (cy - prev.y);
+      prev.pointType = 'smooth';
+      nodes.push(
+        helpers.smoothNode(
+          x,
+          y,
+          x + (2 / 3) * (cx - x),
+          y + (2 / 3) * (cy - y),
+          x,
+          y
+        )
+      );
+    } else if (cmd === 'C') {
+      const c1x = readNum();
+      const c1y = readNum();
+      const c2x = readNum();
+      const c2y = readNum();
+      const x = readNum();
+      const y = readNum();
+      const prev = nodes[nodes.length - 1] || helpers.cornerNode(c1x, c1y);
+      prev.cp2x = c1x;
+      prev.cp2y = c1y;
+      prev.pointType = 'smooth';
+      nodes.push(helpers.smoothNode(x, y, c2x, c2y, x, y));
+    } else if (cmd === 'A') {
+      let rx = Math.max(0.5, Math.abs(readNum()));
+      let ry = Math.max(0.5, Math.abs(readNum()));
+      readNum(); // xAxisRotation
+      const largeArc = readNum() !== 0;
+      const sweep = readNum() !== 0;
+      const x2 = readNum();
+      const y2 = readNum();
+      const prev = nodes[nodes.length - 1] || helpers.cornerNode(x2, y2);
+      const x1 = prev.x;
+      const y1 = prev.y;
+      const dx2 = (x1 - x2) / 2;
+      const dy2 = (y1 - y2) / 2;
+      const lambda = (dx2 * dx2) / (rx * rx) + (dy2 * dy2) / (ry * ry);
+      if (lambda > 1) {
+        const s = Math.sqrt(lambda);
+        rx *= s;
+        ry *= s;
+      }
+      const rx2 = rx * rx;
+      const ry2 = ry * ry;
+      const num = Math.max(0, rx2 * ry2 - rx2 * dy2 * dy2 - ry2 * dx2 * dx2);
+      const den = Math.max(0.0001, rx2 * dy2 * dy2 + ry2 * dx2 * dx2);
+      const sign = largeArc === sweep ? -1 : 1;
+      const coef = sign * Math.sqrt(num / den);
+      const cxp = coef * ((rx * dy2) / ry);
+      const cyp = coef * (-(ry * dx2) / rx);
+      const cx = cxp + (x1 + x2) / 2;
+      const cy = cyp + (y1 + y2) / 2;
+      const theta1 = Math.atan2((y1 - cy) / ry, (x1 - cx) / rx);
+      const theta2 = Math.atan2((y2 - cy) / ry, (x2 - cx) / rx);
+      let dTheta = theta2 - theta1;
+      if (!sweep && dTheta > 0) dTheta -= Math.PI * 2;
+      if (sweep && dTheta < 0) dTheta += Math.PI * 2;
+      const arcPts = helpers.arcNodes(
+        cx,
+        cy,
+        rx,
+        ry,
+        helpers.radToDeg(theta1),
+        helpers.radToDeg(dTheta)
+      );
+      if (arcPts.length > 0) {
+        prev.cp2x = arcPts[0].cp2x;
+        prev.cp2y = arcPts[0].cp2y;
+        prev.pointType = 'smooth';
+        for (let k = 1; k < arcPts.length; k++) {
+          nodes.push(arcPts[k]);
+        }
+      } else {
+        nodes.push(helpers.cornerNode(x2, y2));
+      }
+    } else {
+      i++;
+    }
+  }
+
+  if (closed && nodes.length > 2) {
+    const first = nodes[0];
+    const last = nodes[nodes.length - 1];
+    if (Math.hypot(first.x - last.x, first.y - last.y) < 0.5) {
+      first.cp1x = last.cp1x;
+      first.cp1y = last.cp1y;
+      nodes.pop();
+    }
+  }
+
+  return { nodes, closed };
+}
+
+/**
  * Normalizes any user-returned node or path structure into strict BezierNode paths.
  */
 function normalizeEvaluatedPaths(
   rawPaths: unknown,
-  _helpers: AutoShapeHelpers
+  helpers: AutoShapeHelpers
 ): Array<{ nodes: BezierNode[]; closed: boolean }> {
   if (!rawPaths) {
     return [];
@@ -2969,13 +3148,18 @@ function normalizeEvaluatedPaths(
       typeof rawPaths[0] === 'object' &&
       rawPaths[0] !== null &&
       !('nodes' in (rawPaths[0] as Record<string, unknown>)) &&
+      !('d' in (rawPaths[0] as Record<string, unknown>)) &&
       'x' in (rawPaths[0] as Record<string, unknown>)
     ) {
       candidateList = [{ nodes: rawPaths, closed: true }];
     } else {
       candidateList = rawPaths;
     }
-  } else if (typeof rawPaths === 'object' && 'nodes' in (rawPaths as Record<string, unknown>)) {
+  } else if (
+    typeof rawPaths === 'object' &&
+    ('nodes' in (rawPaths as Record<string, unknown>) ||
+      'd' in (rawPaths as Record<string, unknown>))
+  ) {
     candidateList = [rawPaths];
   } else {
     return [];
@@ -2984,8 +3168,21 @@ function normalizeEvaluatedPaths(
   return candidateList
     .map((item, pathIndex) => {
       if (!item || typeof item !== 'object') return null;
-      const rawNodes = (item as { nodes?: unknown }).nodes;
-      const closed = (item as { closed?: boolean }).closed !== false;
+      const itemObj = item as { nodes?: unknown; d?: unknown; closed?: boolean };
+      let rawNodes = itemObj.nodes;
+      let closed = itemObj.closed !== false;
+
+      if (!rawNodes && 'd' in itemObj) {
+        closed = Boolean(itemObj.closed);
+        if (Array.isArray(itemObj.d)) {
+          rawNodes = itemObj.d;
+        } else if (typeof itemObj.d === 'string') {
+          const parsed = parseSvgPathStringToNodes(itemObj.d, closed, helpers);
+          rawNodes = parsed.nodes;
+          closed = parsed.closed;
+        }
+      }
+
       if (!Array.isArray(rawNodes) || rawNodes.length === 0) return null;
 
       const nodes: BezierNode[] = rawNodes.map((n, nodeIndex) => {
@@ -3021,6 +3218,10 @@ function normalizeEvaluatedPaths(
     .filter((p): p is { nodes: BezierNode[]; closed: boolean } => p !== null);
 }
 
+const evalRunnerCache = new Map<string, Function>();
+const dragRunnerCache = new Map<string, Function>();
+const previewRunnerCache = new Map<string, Function>();
+
 /**
  * Evaluates a Programmable JS AutoShape definition in a sandboxed function scope,
  * returning yellow diamond control handles and cubic Bezier vector sub-paths.
@@ -3050,12 +3251,14 @@ export function evaluateAutoShape(
   const helpers = createAutoShapeHelpers();
 
   try {
-    const runner = new Function(
-      'width',
-      'height',
-      'params',
-      'helpers',
-      `"use strict";
+    let runner = evalRunnerCache.get(code);
+    if (!runner) {
+      runner = new Function(
+        'width',
+        'height',
+        'params',
+        'helpers',
+        `"use strict";
 ${code}
 const _cp = typeof getControlPoints === 'function'
   ? getControlPoints(width, height, params, helpers)
@@ -3064,7 +3267,9 @@ const _paths = typeof buildPaths === 'function'
   ? buildPaths(width, height, params, helpers)
   : (typeof buildNodes === 'function' ? buildNodes(width, height, params, helpers) : []);
 return { controlPoints: _cp, paths: _paths };`
-    );
+      );
+      evalRunnerCache.set(code, runner);
+    }
 
     const result = runner(safeW, safeH, mergedParams, helpers);
     const rawControlPoints = Array.isArray(result?.controlPoints) ? result.controlPoints : [];
@@ -3117,21 +3322,25 @@ export function dragAutoShapeControlPoint(
   const helpers = createAutoShapeHelpers();
 
   try {
-    const runner = new Function(
-      'id',
-      'localX',
-      'localY',
-      'width',
-      'height',
-      'params',
-      'helpers',
-      `"use strict";
+    let runner = dragRunnerCache.get(code);
+    if (!runner) {
+      runner = new Function(
+        'id',
+        'localX',
+        'localY',
+        'width',
+        'height',
+        'params',
+        'helpers',
+        `"use strict";
 ${code}
 if (typeof onDragControlPoint === 'function') {
   return onDragControlPoint(id, localX, localY, width, height, params, helpers);
 }
 return params;`
-    );
+      );
+      dragRunnerCache.set(code, runner);
+    }
 
     const updated = runner(controlId, localX, localY, safeW, safeH, mergedParams, helpers);
     if (updated && typeof updated === 'object') {
@@ -3173,21 +3382,25 @@ export function interactAutoShapeInPreview(
   const helpers = createAutoShapeHelpers();
 
   try {
-    const runner = new Function(
-      'localX',
-      'localY',
-      'width',
-      'height',
-      'params',
-      'helpers',
-      'isDragMove',
-      `"use strict";
+    let runner = previewRunnerCache.get(code);
+    if (!runner) {
+      runner = new Function(
+        'localX',
+        'localY',
+        'width',
+        'height',
+        'params',
+        'helpers',
+        'isDragMove',
+        `"use strict";
 ${code}
 if (typeof onPreviewClick === 'function') {
   return { handled: true, next: onPreviewClick(localX, localY, width, height, params, helpers, isDragMove) };
 }
 return { handled: false, next: null };`
-    );
+      );
+      previewRunnerCache.set(code, runner);
+    }
 
     const res = runner(localX, localY, safeW, safeH, mergedParams, helpers, isDragMove);
     if (res && res.handled && res.next && typeof res.next === 'object') {
