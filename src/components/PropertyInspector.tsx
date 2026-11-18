@@ -860,6 +860,22 @@ export const PropertyInspector: React.FC<PropertyInspectorProps> = ({
         >
           <Crosshair className="w-3 h-3" />
         </button>
+        <button
+          type="button"
+          onClick={() =>
+            onUpdateGridSettings({
+              autoConnectors: !gridSettings.autoConnectors,
+            })
+          }
+          title="Enable or disable blue N/E/S/W Auto-Connector circles on selected objects"
+          className={`px-1.5 py-0.5 rounded-none text-[10px] font-mono border transition-colors ${
+            gridSettings.autoConnectors
+              ? 'bg-[#0c2a3d] border-[#0284c7] text-[#38bdf8] font-semibold'
+              : 'bg-[#181818] border-[#383838] text-[#a3a3a3] hover:text-[#ffffff]'
+          }`}
+        >
+          Auto-Connect: {gridSettings.autoConnectors ? 'ON' : 'OFF'}
+        </button>
       </div>
     );
   };
@@ -1584,52 +1600,56 @@ export const PropertyInspector: React.FC<PropertyInspectorProps> = ({
               type="button"
               onClick={() =>
                 onUpdateGridSettings({
-                  autoConnectors: gridSettings.autoConnectors === false ? true : false,
+                  autoConnectors: !gridSettings.autoConnectors,
                 })
               }
               title="Enable or disable magnetic N/E/S/W Auto-Connector ports and automatic flowchart/sitemap node linking"
               className={`px-2 py-1 rounded-none text-[10px] font-mono border transition-all ${
-                gridSettings.autoConnectors !== false
+                gridSettings.autoConnectors
                   ? 'bg-[#0c2a3d] border-[#0284c7] text-[#38bdf8] font-semibold'
                   : 'bg-[#141414] border-[#333333] text-[#737373] hover:text-[#d4d4d4]'
               }`}
             >
-              Auto-Connect: {gridSettings.autoConnectors !== false ? 'ON' : 'OFF'}
+              Auto-Connect: {gridSettings.autoConnectors ? 'ON' : 'OFF'}
             </button>
 
-            <select
-              value={gridSettings.autoConnectorRouting || 'elbow'}
-              onChange={(e) =>
-                onUpdateGridSettings({
-                  autoConnectorRouting: e.target.value as 'elbow' | 'curved' | 'straight',
-                })
-              }
-              title="Default routing style for Auto-Connectors"
-              className="bg-[#141414] border border-[#404040] px-1.5 py-1 text-[10px] font-mono text-[#e5e5e5] rounded-none"
-            >
-              <option value="elbow">Route: Elbow</option>
-              <option value="curved">Route: Curved</option>
-              <option value="straight">Route: Straight</option>
-            </select>
-
-            {onBranchConnectedNode && (
+            {Boolean(gridSettings.autoConnectors) && (
               <>
-                <button
-                  type="button"
-                  onClick={() => onBranchConnectedNode(obj.id, 'e')}
-                  title="Quick Branch: Spawn a connected child Sitemap/Workflow node to the right"
-                  className="px-2 py-1 rounded-none text-[11px] font-mono bg-[#1a1a1a] hover:bg-[#e5e5e5] text-[#e5e5e5] hover:text-[#0a0a0a] border border-[#525252] flex items-center gap-1 transition-all"
+                <select
+                  value={gridSettings.autoConnectorRouting || 'elbow'}
+                  onChange={(e) =>
+                    onUpdateGridSettings({
+                      autoConnectorRouting: e.target.value as 'elbow' | 'curved' | 'straight',
+                    })
+                  }
+                  title="Default routing style for Auto-Connectors"
+                  className="bg-[#141414] border border-[#404040] px-1.5 py-1 text-[10px] font-mono text-[#e5e5e5] rounded-none"
                 >
-                  <span>+ Branch Right →</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onBranchConnectedNode(obj.id, 's')}
-                  title="Quick Branch: Spawn a connected child Sitemap/Workflow node below"
-                  className="px-2 py-1 rounded-none text-[11px] font-mono bg-[#1a1a1a] hover:bg-[#e5e5e5] text-[#e5e5e5] hover:text-[#0a0a0a] border border-[#525252] flex items-center gap-1 transition-all"
-                >
-                  <span>+ Branch Down ↓</span>
-                </button>
+                  <option value="elbow">Route: Elbow</option>
+                  <option value="curved">Route: Curved</option>
+                  <option value="straight">Route: Straight</option>
+                </select>
+
+                {onBranchConnectedNode && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => onBranchConnectedNode(obj.id, 'e')}
+                      title="Quick Branch: Spawn a connected child Sitemap/Workflow node to the right"
+                      className="px-2 py-1 rounded-none text-[11px] font-mono bg-[#1a1a1a] hover:bg-[#e5e5e5] text-[#e5e5e5] hover:text-[#0a0a0a] border border-[#525252] flex items-center gap-1 transition-all"
+                    >
+                      <span>+ Branch Right →</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onBranchConnectedNode(obj.id, 's')}
+                      title="Quick Branch: Spawn a connected child Sitemap/Workflow node below"
+                      className="px-2 py-1 rounded-none text-[11px] font-mono bg-[#1a1a1a] hover:bg-[#e5e5e5] text-[#e5e5e5] hover:text-[#0a0a0a] border border-[#525252] flex items-center gap-1 transition-all"
+                    >
+                      <span>+ Branch Down ↓</span>
+                    </button>
+                  </>
+                )}
               </>
             )}
 
@@ -1835,7 +1855,7 @@ export const PropertyInspector: React.FC<PropertyInspectorProps> = ({
                 className="w-32 bg-[#0a0a0a] border border-[#1e293b] rounded-none px-1.5 py-0.5 text-[11px] font-sans text-[#ffffff] focus:outline-none focus:border-[#38bdf8]"
               />
             </label>
-            {onBranchConnectedNode && (
+            {Boolean(gridSettings.autoConnectors) && onBranchConnectedNode && (
               <>
                 <button
                   type="button"
@@ -2765,33 +2785,35 @@ export const PropertyInspector: React.FC<PropertyInspectorProps> = ({
               type="button"
               onClick={() =>
                 onUpdateGridSettings({
-                  autoConnectors: gridSettings.autoConnectors === false ? true : false,
+                  autoConnectors: !gridSettings.autoConnectors,
                 })
               }
               title="Enable or disable magnetic N/E/S/W Auto-Connector ports and automatic Flowchart/Sitemap/Drone node linking"
               className={`px-2 py-0.5 rounded-none text-[10px] font-mono border transition-colors ${
-                gridSettings.autoConnectors !== false
+                gridSettings.autoConnectors
                   ? 'bg-[#0c2a3d] border-[#0284c7] text-[#38bdf8] font-semibold'
                   : 'bg-[#0a0a0a] border-[#2e2e2e] text-[#a3a3a3]'
               }`}
             >
-              Auto-Connect: {gridSettings.autoConnectors !== false ? 'ON' : 'OFF'}
+              Auto-Connect: {gridSettings.autoConnectors ? 'ON' : 'OFF'}
             </button>
 
-            <select
-              value={gridSettings.autoConnectorRouting || 'elbow'}
-              onChange={(e) =>
-                onUpdateGridSettings({
-                  autoConnectorRouting: e.target.value as 'elbow' | 'curved' | 'straight',
-                })
-              }
-              title="Default routing style for Auto-Connectors"
-              className="bg-[#0a0a0a] border border-[#2e2e2e] px-1.5 py-0.5 text-[10px] font-mono text-[#e5e5e5] rounded-none"
-            >
-              <option value="elbow">Route: Elbow</option>
-              <option value="curved">Route: Curved</option>
-              <option value="straight">Route: Straight</option>
-            </select>
+            {Boolean(gridSettings.autoConnectors) && (
+              <select
+                value={gridSettings.autoConnectorRouting || 'elbow'}
+                onChange={(e) =>
+                  onUpdateGridSettings({
+                    autoConnectorRouting: e.target.value as 'elbow' | 'curved' | 'straight',
+                  })
+                }
+                title="Default routing style for Auto-Connectors"
+                className="bg-[#0a0a0a] border border-[#2e2e2e] px-1.5 py-0.5 text-[10px] font-mono text-[#e5e5e5] rounded-none"
+              >
+                <option value="elbow">Route: Elbow</option>
+                <option value="curved">Route: Curved</option>
+                <option value="straight">Route: Straight</option>
+              </select>
+            )}
 
             <div className="h-4 w-[1px] bg-[#2e2e2e]" />
 

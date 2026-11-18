@@ -104,6 +104,12 @@ const SHOWCASE_PRESET_CARDS = [
     badge: 'AUTO-ROUTING',
     desc: 'Visual information architecture & funnel diagram wired with live magnetic orthogonal elbow connectors.',
   },
+  {
+    index: 6,
+    title: '7. Avionics PCB Layout',
+    badge: 'PCB AVIONICS',
+    desc: 'Production-ready 4-layer aerospace PCB prototype with STM32 MCU (QFP-48), IMU sensor, 45° copper traces, and DRC rules.',
+  },
 ];
 
 export const PublishModal: React.FC<PublishModalProps> = ({

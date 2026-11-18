@@ -1652,11 +1652,11 @@ export const HybridCanvas: React.FC<HybridCanvasProps> = ({
       return;
     }
 
-    // Lucidchart-Style Magnetic Connection Port Dragging (from Pointer, AutoShape, or Smart Connector Tool)
+    // Lucidchart-Style Magnetic Connection Port Dragging (only when Smart Connector Tool is active or Auto-Connectors are enabled)
     if (
       activeTool === 'connector' ||
       ((activeTool === 'pointer' || activeTool === 'autoshape') &&
-        gridSettings.autoConnectors !== false)
+        Boolean(gridSettings.autoConnectors))
     ) {
       const hitPort = hitTestConnectionPort(rawX, rawY);
       if (hitPort) {
@@ -2501,7 +2501,7 @@ export const HybridCanvas: React.FC<HybridCanvasProps> = ({
 
       const prevSelectedSourceId =
         activeTool === 'autoshape' &&
-        gridSettings.autoConnectors !== false &&
+        Boolean(gridSettings.autoConnectors) &&
         selectedIds.length === 1
           ? selectedIds[0]
           : undefined;
@@ -2709,7 +2709,8 @@ export const HybridCanvas: React.FC<HybridCanvasProps> = ({
       }
 
       if (!isSliceMode) {
-        const portHit = hitTestConnectionPort(rawX, rawY);
+        const allowPorts = activeTool === 'connector' || Boolean(gridSettings.autoConnectors);
+        const portHit = allowPorts ? hitTestConnectionPort(rawX, rawY) : null;
         const nextPort = portHit ? { objectId: portHit.obj.id, port: portHit.port } : null;
         if (
           nextPort?.objectId !== hoveredPort?.objectId ||
@@ -2718,18 +2719,20 @@ export const HybridCanvas: React.FC<HybridCanvasProps> = ({
           setHoveredPort(nextPort);
         }
 
-        const hoveredShape = [...objects]
-          .reverse()
-          .find(
-            (o) =>
-              o.visible &&
-              !o.locked &&
-              !(o.type === 'vector-path' && (o as VectorPathObject).connectorMeta) &&
-              rawX >= o.x - 18 / gridSettings.zoom &&
-              rawX <= o.x + o.width + 18 / gridSettings.zoom &&
-              rawY >= o.y - 18 / gridSettings.zoom &&
-              rawY <= o.y + o.height + 18 / gridSettings.zoom
-          );
+        const hoveredShape = allowPorts
+          ? [...objects]
+              .reverse()
+              .find(
+                (o) =>
+                  o.visible &&
+                  !o.locked &&
+                  !(o.type === 'vector-path' && (o as VectorPathObject).connectorMeta) &&
+                  rawX >= o.x - 18 / gridSettings.zoom &&
+                  rawX <= o.x + o.width + 18 / gridSettings.zoom &&
+                  rawY >= o.y - 18 / gridSettings.zoom &&
+                  rawY <= o.y + o.height + 18 / gridSettings.zoom
+              )
+          : undefined;
         const nextHoveredId = hoveredShape ? hoveredShape.id : null;
         if (nextHoveredId !== hoveredObjectId) {
           setHoveredObjectId(nextHoveredId);
@@ -3516,7 +3519,7 @@ export const HybridCanvas: React.FC<HybridCanvasProps> = ({
       if (
         drag.autoConnectFromId &&
         drag.targetObjectId &&
-        gridSettings.autoConnectors !== false &&
+        Boolean(gridSettings.autoConnectors) &&
         onConnectObjects
       ) {
         const sourceObj = objects.find((o) => o.id === drag.autoConnectFromId);
@@ -4589,7 +4592,7 @@ export const HybridCanvas: React.FC<HybridCanvasProps> = ({
         const showPortsForObject =
           activeTool === 'connector' ||
           isDrawingConnector ||
-          (gridSettings.autoConnectors !== false &&
+          (Boolean(gridSettings.autoConnectors) &&
             (selectedIds.includes(obj.id) ||
               hoveredObjectId === obj.id ||
               hoveredPort?.objectId === obj.id));
@@ -5241,17 +5244,17 @@ export const HybridCanvas: React.FC<HybridCanvasProps> = ({
         <button
           onClick={() =>
             onUpdateGridSettings({
-              autoConnectors: gridSettings.autoConnectors === false ? true : false,
+              autoConnectors: !gridSettings.autoConnectors,
             })
           }
           className={`px-1.5 py-0.5 rounded-none text-[10px] border ${
-            gridSettings.autoConnectors !== false
+            gridSettings.autoConnectors
               ? 'bg-[#0c2a3d] text-[#38bdf8] border-[#0284c7] font-semibold'
               : 'border-[#262626] text-[#737373] hover:bg-[#1f1f1f]'
           }`}
           title="Toggle Magnetic Auto-Connectors (N/E/S/W ports & auto-linking new Flowchart/Sitemap/Drone shapes)"
         >
-          Auto-Connect: {gridSettings.autoConnectors !== false ? 'ON' : 'OFF'}
+          Auto-Connect: {gridSettings.autoConnectors ? 'ON' : 'OFF'}
         </button>
         <button
           onClick={cycleCanvasBackdrop}
@@ -5276,9 +5279,11 @@ export const HybridCanvas: React.FC<HybridCanvasProps> = ({
             <>
               {activeTool === 'pointer' && (
                 <span>
-                  <strong className="text-white">Pointer (V):</strong> Double-click any shape to edit centered text • Drag{' '}
-                  <span className="text-white font-semibold">◆ handles</span> on AutoShapes, or drag any{' '}
-                  <span className="text-[#38bdf8] font-semibold">● N/E/S/W port</span> to auto-connect workflows!
+                  <strong className="text-white">Pointer (V):</strong> Double-click any shape to edit centered text • Drag handles to resize or drag{' '}
+                  <span className="text-white font-semibold">◆ handles</span> on AutoShapes
+                  {gridSettings.autoConnectors
+                    ? ' • Drag ● N/E/S/W ports to auto-connect workflows!'
+                    : '.'}
                 </span>
               )}
               {activeTool === 'connector' && (

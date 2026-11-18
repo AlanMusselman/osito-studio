@@ -1,0 +1,753 @@
+{
+  "totalChecks": 88,
+  "passedChecks": 88,
+  "failedChecks": 0,
+  "routingClosures": {
+    "pcb-route-trace-straight": {
+      "totalPaths": 5,
+      "closedPaths": 5,
+      "openPaths": 0,
+      "subpaths": [
+        {
+          "index": 0,
+          "closed": true,
+          "nodeCount": 8
+        },
+        {
+          "index": 1,
+          "closed": true,
+          "nodeCount": 4
+        },
+        {
+          "index": 2,
+          "closed": true,
+          "nodeCount": 4
+        },
+        {
+          "index": 3,
+          "closed": true,
+          "nodeCount": 4
+        },
+        {
+          "index": 4,
+          "closed": true,
+          "nodeCount": 4
+        }
+      ]
+    },
+    "pcb-route-trace-45": {
+      "totalPaths": 5,
+      "closedPaths": 5,
+      "openPaths": 0,
+      "subpaths": [
+        {
+          "index": 0,
+          "closed": true,
+          "nodeCount": 8
+        },
+        {
+          "index": 1,
+          "closed": true,
+          "nodeCount": 4
+        },
+        {
+          "index": 2,
+          "closed": true,
+          "nodeCount": 4
+        },
+        {
+          "index": 3,
+          "closed": true,
+          "nodeCount": 4
+        },
+        {
+          "index": 4,
+          "closed": true,
+          "nodeCount": 4
+        }
+      ]
+    },
+    "pcb-route-bus": {
+      "totalPaths": 13,
+      "closedPaths": 13,
+      "openPaths": 0,
+      "subpaths": [
+        {
+          "index": 0,
+          "closed": true,
+          "nodeCount": 8
+        },
+        {
+          "index": 1,
+          "closed": true,
+          "nodeCount": 8
+        },
+        {
+          "index": 2,
+          "closed": true,
+          "nodeCount": 4
+        },
+        {
+          "index": 3,
+          "closed": true,
+          "nodeCount": 4
+        },
+        {
+          "index": 4,
+          "closed": true,
+          "nodeCount": 8
+        },
+        {
+          "index": 5,
+          "closed": true,
+          "nodeCount": 4
+        },
+        {
+          "index": 6,
+          "closed": true,
+          "nodeCount": 4
+        },
+        {
+          "index": 7,
+          "closed": true,
+          "nodeCount": 8
+        },
+        {
+          "index": 8,
+          "closed": true,
+          "nodeCount": 4
+        },
+        {
+          "index": 9,
+          "closed": true,
+          "nodeCount": 4
+        },
+        {
+          "index": 10,
+          "closed": true,
+          "nodeCount": 8
+        },
+        {
+          "index": 11,
+          "closed": true,
+          "nodeCount": 4
+        },
+        {
+          "index": 12,
+          "closed": true,
+          "nodeCount": 4
+        }
+      ]
+    }
+  },
+  "shapesWithOpenSubpaths": [
+    {
+      "id": "pcb-passive-smd-chip",
+      "openSubpathIndices": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "descriptions": [
+        "subpath 3 (nodes=3)",
+        "subpath 4 (nodes=3)",
+        "subpath 5 (nodes=3)",
+        "subpath 6 (nodes=3)"
+      ]
+    },
+    {
+      "id": "pcb-passive-axial",
+      "openSubpathIndices": [
+        1,
+        2
+      ],
+      "descriptions": [
+        "subpath 1 (nodes=2)",
+        "subpath 2 (nodes=2)"
+      ]
+    },
+    {
+      "id": "pcb-passive-trimmer",
+      "openSubpathIndices": [
+        2
+      ],
+      "descriptions": [
+        "subpath 2 (nodes=2)"
+      ]
+    },
+    {
+      "id": "pcb-conn-terminal-block",
+      "openSubpathIndices": [
+        3,
+        6
+      ],
+      "descriptions": [
+        "subpath 3 (nodes=2)",
+        "subpath 6 (nodes=2)"
+      ]
+    },
+    {
+      "id": "pcb-conn-power-pads",
+      "openSubpathIndices": [
+        3,
+        4,
+        5
+      ],
+      "descriptions": [
+        "subpath 3 (nodes=2)",
+        "subpath 4 (nodes=2)",
+        "subpath 5 (nodes=2)"
+      ]
+    },
+    {
+      "id": "pcb-outline-slot",
+      "openSubpathIndices": [
+        1
+      ],
+      "descriptions": [
+        "subpath 1 (nodes=2)"
+      ]
+    }
+  ],
+  "categories": {
+    "closure": [
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-ic-dip",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-ic-soic",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-ic-qfp",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-ic-qfn",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-discrete-sot",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-power-to220",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-passive-smd-chip",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-passive-axial",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-passive-radial-cap",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-passive-inductor-smd",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-passive-trimmer",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-conn-header-0100",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-conn-jst",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-conn-usbc",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-conn-microusb",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-conn-terminal-block",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-conn-power-pads",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-feature-smd-pad",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-feature-circular-pad",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-feature-th-pad",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-feature-via",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-feature-test-point",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-feature-fiducial",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-feature-mounting-hole",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-outline-board",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-outline-slot",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      },
+      {
+        "name": "Outer Body Subpath 0 Closure: pcb-outline-mousebites",
+        "passed": true,
+        "details": "Expected subpath 0 to have closed: true, got true",
+        "category": "closure"
+      }
+    ],
+    "subpaths": [
+      {
+        "name": "Multi-Subpath Decomposition: pcb-ic-dip",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 30",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-ic-dip",
+        "passed": true,
+        "details": "All 29 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-ic-soic",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 10",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-ic-soic",
+        "passed": true,
+        "details": "All 9 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-ic-qfp",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 50",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-ic-qfp",
+        "passed": true,
+        "details": "All 49 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-ic-qfn",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 35",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-ic-qfn",
+        "passed": true,
+        "details": "All 34 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-discrete-sot",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 6",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-discrete-sot",
+        "passed": true,
+        "details": "All 5 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-power-to220",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 9",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-power-to220",
+        "passed": true,
+        "details": "All 8 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-passive-smd-chip",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 7",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-passive-smd-chip",
+        "passed": true,
+        "details": "All 6 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-passive-axial",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 8",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-passive-axial",
+        "passed": true,
+        "details": "All 7 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-passive-radial-cap",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 6",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-passive-radial-cap",
+        "passed": true,
+        "details": "All 5 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-passive-inductor-smd",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 4",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-passive-inductor-smd",
+        "passed": true,
+        "details": "All 3 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-passive-trimmer",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 9",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-passive-trimmer",
+        "passed": true,
+        "details": "All 8 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-conn-header-0100",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 13",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-conn-header-0100",
+        "passed": true,
+        "details": "All 12 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-conn-jst",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 7",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-conn-jst",
+        "passed": true,
+        "details": "All 6 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-conn-usbc",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 18",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-conn-usbc",
+        "passed": true,
+        "details": "All 17 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-conn-microusb",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 14",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-conn-microusb",
+        "passed": true,
+        "details": "All 13 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-conn-terminal-block",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 7",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-conn-terminal-block",
+        "passed": true,
+        "details": "All 6 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-conn-power-pads",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 6",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-conn-power-pads",
+        "passed": true,
+        "details": "All 5 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-feature-smd-pad",
+        "passed": true,
+        "details": "All 1 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-feature-circular-pad",
+        "passed": true,
+        "details": "All 1 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-feature-th-pad",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 2",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-feature-th-pad",
+        "passed": true,
+        "details": "All 1 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-feature-via",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 2",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-feature-via",
+        "passed": true,
+        "details": "All 1 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-feature-test-point",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 2",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-feature-test-point",
+        "passed": true,
+        "details": "All 1 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-route-trace-straight",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 5",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-route-trace-straight",
+        "passed": true,
+        "details": "All 4 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-route-trace-45",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 5",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-route-trace-45",
+        "passed": true,
+        "details": "All 4 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-route-bus",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 13",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-route-bus",
+        "passed": true,
+        "details": "All 12 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-feature-fiducial",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 3",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-feature-fiducial",
+        "passed": true,
+        "details": "All 2 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-feature-mounting-hole",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 3",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-feature-mounting-hole",
+        "passed": true,
+        "details": "All 2 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-outline-board",
+        "passed": true,
+        "details": "All 9 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-outline-slot",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 2",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-outline-slot",
+        "passed": true,
+        "details": "All 1 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      },
+      {
+        "name": "Multi-Subpath Decomposition: pcb-outline-mousebites",
+        "passed": true,
+        "details": "Expected >= 2 subpaths for compound shape, got 6",
+        "category": "subpaths"
+      },
+      {
+        "name": "Subpaths 1..N Geometry Validity: pcb-outline-mousebites",
+        "passed": true,
+        "details": "All 5 inner subpaths verified with finite coordinates",
+        "category": "subpaths"
+      }
+    ],
+    "dimensions": [
+      {
+        "name": "Dimension Singularity Oracle (NaN/Infinity)",
+        "passed": true,
+        "details": "Detected 0 non-finite coordinate anomalies across all 30 shapes and 8 stress dimension sets",
+        "category": "dimensions"
+      },
+      {
+        "name": "Dimension Exception Oracle",
+        "passed": true,
+        "details": "Detected 0 unhandled exceptions across all 30 shapes and 8 stress dimension sets",
+        "category": "dimensions"
+      }
+    ],
+    "params": [
+      {
+        "name": "Parametric Robustness Oracle",
+        "passed": true,
+        "details": "Evaluated all parameter extreme inputs across 30 shapes (0 anomalies)",
+        "category": "params"
+      }
+    ],
+    "control_points": [
+      {
+        "name": "Control Point Dragging Oracle",
+        "passed": true,
+        "details": "Tested all control points across 30 shapes with extreme drag coordinates (0 anomalies)",
+        "category": "control_points"
+      }
+    ]
+  }
+}

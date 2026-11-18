@@ -81,7 +81,10 @@ import {
   exportSlicesToMultiScaleZip,
   generateSmartStateVariants,
 } from './engine/sliceZipExporter';
-import { createStarterSceneObjects } from './engine/starterScene';
+import {
+  createStarterSceneObjects,
+  createPcbStarterSceneObjects,
+} from './engine/starterScene';
 import { LeftToolDock } from './components/LeftToolDock';
 import { PropertyInspector } from './components/PropertyInspector';
 import { LayersAndHistoryPanel } from './components/LayersAndHistoryPanel';
@@ -201,7 +204,7 @@ export const App: React.FC = () => {
     snapToGrid: false,
     snapToPixel: true,
     snapToObjects: true,
-    autoConnectors: true,
+    autoConnectors: false,
     autoConnectorRouting: 'elbow',
     showRulers: true,
     showSlices: false,
@@ -750,7 +753,7 @@ export const App: React.FC = () => {
         def.id.startsWith('flow-');
 
       const sourceObjForAutoConnect =
-        gridSettings.autoConnectors !== false &&
+        Boolean(gridSettings.autoConnectors) &&
         !isNavbarOrMegaMenu &&
         isFlowOrSitemapOrDrone &&
         selectedIds.length === 1
@@ -2374,7 +2377,7 @@ export const App: React.FC = () => {
 
   const handleLoadShowcasePreset = useCallback(
     (presetIndex: number) => {
-      const normalized = ((presetIndex % 6) + 6) % 6;
+      const normalized = ((presetIndex % 7) + 7) % 7;
       closeAllTopMenus();
       setActiveShowcaseIndex(normalized);
 
@@ -2412,6 +2415,22 @@ export const App: React.FC = () => {
           false,
           'Osito Multi-Site Conversion & Autonomous Dispatch Flow'
         );
+      } else if (normalized === 6) {
+        recordHistorySnapshot();
+        setObjects(createPcbStarterSceneObjects());
+        setSlices([]);
+        setSelectedIds(['pcb-u1-mcu']);
+        setGridSettings((prev) => ({
+          ...prev,
+          canvasWidth: 960,
+          canvasHeight: 600,
+          zoom: 1,
+          panX: 0,
+          panY: 0,
+          canvasViewMode: 'design',
+          showSlices: false,
+        }));
+        showToast('Loaded Showcase 7/7: CUB-FC405 Avionics PCB Layout');
       }
     },
     [
@@ -2420,6 +2439,8 @@ export const App: React.FC = () => {
       handleInstantSpawnResearchedWebsite,
       handleGenerateWebsiteLayout,
       handleInstantSpawnStrategyBoard,
+      recordHistorySnapshot,
+      showToast,
     ]
   );
 
@@ -2431,45 +2452,52 @@ export const App: React.FC = () => {
     () => [
       {
         idx: 0,
-        badge: 'SCENE 1/6 • HYBRID VECTOR + BITMAP LAB',
+        badge: 'SCENE 1/7 • HYBRID VECTOR + BITMAP LAB',
         title: 'Flagship Osito Hybrid Studio',
         detail:
           'Simultaneous Cubic Bezier paths (A), 1px Bitmap Marquee Cut/Paste (M), and 125+ programmable .JSF AutoShapes (◆) on one unified canvas.',
       },
       {
         idx: 1,
-        badge: 'SCENE 2/6 • LIVE :HOVER & NESTED MENUS',
+        badge: 'SCENE 2/7 • LIVE :HOVER & NESTED MENUS',
         title: 'Autonomous Security Drone Website',
         detail:
           'Live Preview Mode active — hover & click the top navigation bar to test multi-level flyout dropdowns and interactive :hover states.',
       },
       {
         idx: 2,
-        badge: 'SCENE 3/6 • BENTO HARDWARE & LIVE FX',
+        badge: 'SCENE 3/7 • BENTO HARDWARE & LIVE FX',
         title: 'Apple-Style Bento Hardware Grid',
         detail:
           '1px pixel-snapped hardware showcase cards with custom gradients, 1-Click Live Effects (+FX), and @1x/@2x/@3x Retina web slices.',
       },
       {
         idx: 3,
-        badge: 'SCENE 4/6 • EXECUTIVE AI STRATEGY BOARD',
+        badge: 'SCENE 4/7 • EXECUTIVE AI STRATEGY BOARD',
         title: 'Deep Research & Competitive War-Room',
         detail:
           'Auto-synthesized 25+ layer executive strategy board with ICP personas, competitor moat matrix, and live WCAG 2.2 contrast scoring.',
       },
       {
         idx: 4,
-        badge: 'SCENE 5/6 • REAL-TIME TELEMETRY HUD',
+        badge: 'SCENE 5/7 • REAL-TIME TELEMETRY HUD',
         title: 'AI Fleet Command & KPI Dashboard',
         detail:
           'Programmable sparklines, radial gauges, and telemetry widgets driven by live JavaScript AutoShape diamond control handles.',
       },
       {
         idx: 5,
-        badge: 'SCENE 6/6 • MAGNETIC FLOW BLUEPRINT',
+        badge: 'SCENE 6/7 • MAGNETIC FLOW BLUEPRINT',
         title: 'System Architecture & Auto-Routing',
         detail:
           'Lucidchart-style magnetic N/E/S/W ports with orthogonal elbow connectors that automatically re-route whenever nodes move.',
+      },
+      {
+        idx: 6,
+        badge: 'AVIONICS PCB',
+        title: 'CUB-FC405 Flight Controller Layout',
+        detail:
+          'Production-ready 4-layer aerospace PCB prototype with STM32 MCU, IMU sensor, 45° traces, and DRC rules.',
       },
     ],
     []
@@ -2480,10 +2508,10 @@ export const App: React.FC = () => {
     setIsDemoTourPlaying((prev) => {
       const nextState = !prev;
       if (nextState) {
-        const nextIdx = (activeShowcaseIndex + 1) % 6;
+        const nextIdx = (activeShowcaseIndex + 1) % 7;
         handleLoadShowcasePreset(nextIdx);
         showToast(
-          `▶ Started Interactive Demo Tour (${nextIdx + 1}/6): ${demoTourSteps[nextIdx].title}`
+          `▶ Started Interactive Demo Tour (${nextIdx + 1}/7): ${demoTourSteps[nextIdx].title}`
         );
       } else {
         showToast('■ Stopped Demo Tour — canvas ready for live editing!');
@@ -2495,7 +2523,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     if (!isDemoTourPlaying) return;
     const timerId = window.setInterval(() => {
-      const nextIdx = (activeShowcaseIndex + 1) % 6;
+      const nextIdx = (activeShowcaseIndex + 1) % 7;
       handleLoadShowcasePreset(nextIdx);
     }, 4400);
     return () => window.clearInterval(timerId);
@@ -4699,17 +4727,17 @@ export const App: React.FC = () => {
                         onClick={() =>
                           setGridSettings((prev) => ({
                             ...prev,
-                            autoConnectors: prev.autoConnectors === false ? true : false,
+                            autoConnectors: !prev.autoConnectors,
                           }))
                         }
                         className={`flex-1 px-2 py-1.5 border text-center transition text-[10px] ${
-                          gridSettings.autoConnectors !== false
+                          gridSettings.autoConnectors
                             ? 'bg-[#0c2a3d] text-[#38bdf8] border-[#0284c7] font-bold'
                             : 'bg-[#181818] text-[#737373] border-[#333333]'
                         }`}
                         title="Toggle Magnetic N/E/S/W Auto-Connector ports & automatic Flowchart/Sitemap/Drone shape linking"
                       >
-                        Auto-Connectors: {gridSettings.autoConnectors !== false ? 'ON' : 'OFF'}
+                        Auto-Connectors: {gridSettings.autoConnectors ? 'ON' : 'OFF'}
                       </button>
 
                       <select
@@ -4989,7 +5017,7 @@ export const App: React.FC = () => {
                           snapToGrid: false,
                           snapToPixel: true,
                           snapToObjects: true,
-                          autoConnectors: true,
+                          autoConnectors: false,
                           autoConnectorRouting: 'elbow',
                           showRulers: true,
                           showSlices: false,
@@ -5021,7 +5049,7 @@ export const App: React.FC = () => {
                   ? 'bg-[#ffffff] text-[#0a0a0a] border-[#ffffff]'
                   : 'bg-[#1c1c1c] hover:bg-[#292929] border-[#484848] text-[#e5e5e5]'
               }`}
-              title="File Menu — Switch 6 Live Showcase Presets, Run Demo Tour, Import Files (PNG/SVG/JS/CSV), or Save Project"
+              title="File Menu — Switch 7 Live Showcase Presets, Run Demo Tour, Import Files (PNG/SVG/JS/CSV), or Save Project"
             >
               <Save className="w-3.5 h-3.5" />
               <span>File &amp; Presets</span>
@@ -5036,11 +5064,11 @@ export const App: React.FC = () => {
                 style={{ zIndex: 999 }}
                 className="absolute left-0 top-full mt-1 w-80 max-h-[82vh] overflow-y-auto bg-[#121212] border border-[#525252] shadow-2xl z-[999] rounded-none divide-y divide-[#262626] font-mono text-[11px]"
               >
-                {/* Section 1: 6 Instant Showcase Presets + Auto-Play Demo Tour */}
+                {/* Section 1: 7 Instant Showcase Presets + Auto-Play Demo Tour */}
                 <div className="p-2 space-y-1.5 bg-[#161616]">
                   <div className="flex items-center justify-between">
                     <span className="text-[9px] font-bold uppercase tracking-wider text-[#d4d4d4]">
-                      Showcase Presets ({activeShowcaseIndex + 1}/6)
+                      Showcase Presets ({activeShowcaseIndex + 1}/7)
                     </span>
                     <div className="flex items-center gap-1">
                       <button
@@ -5078,6 +5106,7 @@ export const App: React.FC = () => {
                       { idx: 3, label: '4. Executive AI Strategy Board', tag: 'War-Room' },
                       { idx: 4, label: '5. AI Telemetry Dashboard', tag: 'Analytics' },
                       { idx: 5, label: '6. System Flow Blueprint', tag: 'Connectors' },
+                      { idx: 6, label: '7. CUB-FC405 Avionics PCB Layout', tag: 'Avionics' },
                     ].map((item) => (
                       <button
                         key={item.idx}
@@ -5846,6 +5875,7 @@ export const App: React.FC = () => {
         onExportPng={handleExportPng}
         onOpenCodeStudio={() => setIsCodeStudioOpen(true)}
         onResetStarterShowcase={handleResetStarterShowcase}
+        onLoadShowcasePreset={handleLoadShowcasePreset}
         canvasScoreSummary={{
           score: canvasAuditReport.overallScore,
           grade: canvasAuditReport.grade,

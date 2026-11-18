@@ -1591,3 +1591,5 @@ export function createStarterSceneObjects(): CanvasObject[] {
     ...navbarLayers,
   ];
 }
+
+export { createPcbStarterSceneObjects } from './pcbStarterScene';

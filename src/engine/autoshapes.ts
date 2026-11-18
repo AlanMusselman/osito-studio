@@ -8,6 +8,7 @@ import type {
 import { WEB_LAYOUT_AND_UI_AUTOSHAPES } from './webLayoutAutoshapes';
 import { SITEMAP_AND_FLOW_AUTOSHAPES } from './sitemapAndFlowAutoshapes';
 import { DRONE_PARTS_AND_FRAMES_AUTOSHAPES } from './droneAutoshapes';
+import { PCB_LAYOUT_AUTOSHAPES } from './pcbLayoutAutoshapes';
 
 export const CUSTOM_AUTOSHAPES_STORAGE_KEY = 'evolve_mx_custom_autoshapes_v1';
 
@@ -2634,6 +2635,7 @@ function buildPaths(width, height, params, helpers) {
   ...WEB_LAYOUT_AND_UI_AUTOSHAPES,
   ...SITEMAP_AND_FLOW_AUTOSHAPES,
   ...DRONE_PARTS_AND_FRAMES_AUTOSHAPES,
+  ...PCB_LAYOUT_AUTOSHAPES,
   // 17. Smart Regular Polygon & Hexagon Core
   {
     id: 'polygon',
@@ -2863,15 +2865,17 @@ function buildPaths(width, height, params, helpers) {
 
 export const DEFAULT_AUTOSHAPES: AutoShapeDefinition[] =
   RAW_DEFAULT_AUTOSHAPES.map((shape): AutoShapeDefinition => {
-    const isFlowOrSitemapOrDrone =
+    const isFlowOrSitemapOrDroneOrPcb =
       shape.category === 'Flow & Diagrams' ||
       shape.category === 'Drone Parts & Frames' ||
+      shape.category === 'PCB Layout' ||
+      shape.id.startsWith('pcb-') ||
       shape.id.startsWith('sitemap-') ||
       shape.id.startsWith('flow-') ||
       shape.id === 'workflow-decision' ||
       shape.id === 'database-cylinder';
 
-    if (!isFlowOrSitemapOrDrone) {
+    if (!isFlowOrSitemapOrDroneOrPcb) {
       return shape;
     }
 
@@ -2880,7 +2884,7 @@ export const DEFAULT_AUTOSHAPES: AutoShapeDefinition[] =
       typeof shape.defaultParams.label === 'string'
         ? shape.defaultParams.label
         : shape.name
-            .replace(/^(Smart|Sitemap|Flowchart|Flow|Drone|Drone Part):\s*/i, '')
+            .replace(/^(Smart|Sitemap|Flowchart|Flow|Drone|Drone Part|PCB|PCB Layout|Footprint):\s*/i, '')
             .replace(/^Smart\s+/i, '')
             .replace(/\s+Node$/i, '')
             .slice(0, 22);

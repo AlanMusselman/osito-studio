@@ -1,0 +1,1077 @@
+{
+  "timestamp": "2026-11-09T23:00:17.749Z",
+  "verdict": "APPROVE",
+  "totalTests": 23,
+  "passedTests": 23,
+  "failedTests": 0,
+  "microUsb": {
+    "thSubpaths": 14,
+    "smtSubpaths": 10,
+    "toggleWorks": true
+  },
+  "outlineSlot": {
+    "orientHAspect": 16,
+    "orientVAspect": 0.08450704225352113,
+    "dragWorksH": true,
+    "dragWorksV": true,
+    "toggleWorks": true
+  },
+  "controlPoints": {
+    "total": 45,
+    "active": 45,
+    "dead": 0,
+    "deadList": [],
+    "details": [
+      {
+        "shapeId": "pcb-ic-dip",
+        "cpId": "pinCount",
+        "label": "14 Pins",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "pinCount"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-ic-dip",
+        "cpId": "rowSpacing",
+        "label": "Row: 70%",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "rowSpacingRatio"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-ic-soic",
+        "cpId": "pins",
+        "label": "8 Pins",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "pins"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-ic-soic",
+        "cpId": "bodyWidth",
+        "label": "Body: 58%",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "bodyWidthRatio"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-ic-qfp",
+        "cpId": "pinsPerSide",
+        "label": "48 Pins",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "pinsPerSide"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-ic-qfp",
+        "cpId": "bodyRatio",
+        "label": "Body: 68%",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "bodyRatio"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-ic-qfn",
+        "cpId": "pinsPerSide",
+        "label": "24 Pins",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "pinsPerSide"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-ic-qfn",
+        "cpId": "thermalPad",
+        "label": "Thermal: 48%",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "thermalPadRatio"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-discrete-sot",
+        "cpId": "bodyWidth",
+        "label": "Body: 52%",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "bodyWidthRatio"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-discrete-sot",
+        "cpId": "packageType",
+        "label": "SOT-223",
+        "cursor": "pointer",
+        "mutatedKeys": [
+          "packageType"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-power-to220",
+        "cpId": "tabHeight",
+        "label": "Tab: 35%",
+        "cursor": "ns-resize",
+        "mutatedKeys": [
+          "tabHeightRatio"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-power-to220",
+        "cpId": "leadCount",
+        "label": "3 Leads",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "leadCount"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-passive-smd-chip",
+        "cpId": "padWidth",
+        "label": "Pad: 28%",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "padWidthRatio"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-passive-smd-chip",
+        "cpId": "type",
+        "label": "Resistor (R)",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "componentType"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-passive-axial",
+        "cpId": "bodyLength",
+        "label": "Body: 45%",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "bodyLengthRatio"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-passive-axial",
+        "cpId": "leadSpan",
+        "label": "Span: 85%",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "leadSpanRatio"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-passive-radial-cap",
+        "cpId": "diameter",
+        "label": "Can: 78%",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "diameterRatio"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-passive-radial-cap",
+        "cpId": "pinPitch",
+        "label": "Pitch: 36%",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "pinPitchRatio"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-passive-inductor-smd",
+        "cpId": "padWidth",
+        "label": "Pad: 22%",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "padWidthRatio"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-passive-trimmer",
+        "cpId": "screw",
+        "label": "Screw: 50%",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "screwOffsetRatio"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-conn-header-0100",
+        "cpId": "pins",
+        "label": "6 Pins",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "pins"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-conn-jst",
+        "cpId": "pins",
+        "label": "4 Pins",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "pins"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-conn-jst",
+        "cpId": "series",
+        "label": "JST-SH (1.0mm)",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "series"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-conn-usbc",
+        "cpId": "tabLength",
+        "label": "Tab: 14%",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "tabLengthRatio"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-conn-usbc",
+        "cpId": "overhang",
+        "label": "Overhang: 18%",
+        "cursor": "ns-resize",
+        "mutatedKeys": [
+          "overhangRatio"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-conn-microusb",
+        "cpId": "tabLength",
+        "label": "Tab: 16%",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "tabLengthRatio"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-conn-terminal-block",
+        "cpId": "poles",
+        "label": "2 Poles",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "poles"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-conn-power-pads",
+        "cpId": "gap",
+        "label": "Gap: 32%",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "padGapRatio"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-feature-smd-pad",
+        "cpId": "radius",
+        "label": "Radius: 4px",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "cornerRadius"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-feature-circular-pad",
+        "cpId": "diameter",
+        "label": "Pad: 75%",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "diameterRatio"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-feature-th-pad",
+        "cpId": "drill",
+        "label": "Drill: 45%",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "drillRatio"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-feature-via",
+        "cpId": "grid",
+        "label": "Grid: 1x1",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "gridSize"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-feature-test-point",
+        "cpId": "padSize",
+        "label": "Size: 55%",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "padRadiusRatio"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-feature-test-point",
+        "cpId": "type",
+        "label": "Circle",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "pointType"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-route-trace-straight",
+        "cpId": "width",
+        "label": "Width: 8px",
+        "cursor": "ns-resize",
+        "mutatedKeys": [
+          "traceWidth"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-route-trace-45",
+        "cpId": "width",
+        "label": "Width: 8px",
+        "cursor": "ns-resize",
+        "mutatedKeys": [
+          "traceWidth"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-route-trace-45",
+        "cpId": "corner",
+        "label": "Miter: 50%",
+        "cursor": "move",
+        "mutatedKeys": [
+          "cornerOffsetRatio"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-route-bus",
+        "cpId": "tracks",
+        "label": "4 Tracks",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "tracks"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-route-bus",
+        "cpId": "width",
+        "label": "Width: 4px",
+        "cursor": "ns-resize",
+        "mutatedKeys": [
+          "trackWidth"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-feature-fiducial",
+        "cpId": "dot",
+        "label": "Dot: 35%",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "dotDiameterRatio"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-feature-mounting-hole",
+        "cpId": "size",
+        "label": "M3 (3.2mm)",
+        "cursor": "pointer",
+        "mutatedKeys": [
+          "holeSize"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-outline-board",
+        "cpId": "radius",
+        "label": "Radius: 12px",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "cornerRadius"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-outline-board",
+        "cpId": "inset",
+        "label": "Inset: 9%",
+        "cursor": "move",
+        "mutatedKeys": [
+          "holeInsetRatio"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-outline-slot",
+        "cpId": "width",
+        "label": "Width: 12px",
+        "cursor": "ns-resize",
+        "mutatedKeys": [
+          "slotWidth"
+        ],
+        "active": true,
+        "reEvalOk": true
+      },
+      {
+        "shapeId": "pcb-outline-mousebites",
+        "cpId": "holes",
+        "label": "5 Holes",
+        "cursor": "ew-resize",
+        "mutatedKeys": [
+          "holes"
+        ],
+        "active": true,
+        "reEvalOk": true
+      }
+    ]
+  },
+  "previewInteractivity": {
+    "total": 30,
+    "active": 30,
+    "noops": 0,
+    "noopsList": [],
+    "details": [
+      {
+        "shapeId": "pcb-ic-dip",
+        "previewHint": "Click in Preview Mode to toggle Pin 1 orientation notch",
+        "changed": true,
+        "mutatedKeys": [
+          "showNotch"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-ic-soic",
+        "previewHint": "Click in Preview Mode to step through standard pin counts (8, 14, 16, 20, 28)",
+        "changed": true,
+        "mutatedKeys": [
+          "pins"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-ic-qfp",
+        "previewHint": "Click in Preview Mode to step through QFP-32, 48, 64, 100 pin configurations",
+        "changed": true,
+        "mutatedKeys": [
+          "pinsPerSide"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-ic-qfn",
+        "previewHint": "Click in Preview Mode to toggle central thermal via grid",
+        "changed": true,
+        "mutatedKeys": [
+          "showThermalVias"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-discrete-sot",
+        "previewHint": "Click in Preview Mode to cycle between SOT-23 (3-pin), SOT-223 (4-pin tab), and SOT-23-5",
+        "changed": true,
+        "mutatedKeys": [
+          "packageType"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-power-to220",
+        "previewHint": "Click in Preview Mode to toggle central mounting screw hole",
+        "changed": true,
+        "mutatedKeys": [
+          "showHole"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-passive-smd-chip",
+        "previewHint": "Click in Preview Mode to cycle component symbol (Resistor -> Capacitor -> Inductor)",
+        "changed": true,
+        "mutatedKeys": [
+          "componentType"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-passive-axial",
+        "previewHint": "Click in Preview Mode to toggle between Diode and Resistor package marking",
+        "changed": true,
+        "mutatedKeys": [
+          "isDiode"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-passive-radial-cap",
+        "previewHint": "Click in Preview Mode to toggle polarity markings",
+        "changed": true,
+        "mutatedKeys": [
+          "polarityStripe"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-passive-inductor-smd",
+        "previewHint": "Click in Preview Mode to toggle internal magnetic core silkscreen circle",
+        "changed": true,
+        "mutatedKeys": [
+          "showCoreMark"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-passive-trimmer",
+        "previewHint": "Click in Preview Mode to step screw slot rotation angle",
+        "changed": true,
+        "mutatedKeys": [
+          "slotAngleDeg"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-conn-header-0100",
+        "previewHint": "Click in Preview Mode to toggle between Single-Row (1xN) and Dual-Row (2xN)",
+        "changed": true,
+        "mutatedKeys": [
+          "isDualRow"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-conn-jst",
+        "previewHint": "Click in Preview Mode to cycle series: JST-SH (1.0mm) -> JST-GH (1.25mm) -> JST-XH (2.5mm)",
+        "changed": true,
+        "mutatedKeys": [
+          "series"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-conn-usbc",
+        "previewHint": "Click in Preview Mode to toggle internal signal pin visibility",
+        "changed": true,
+        "mutatedKeys": [
+          "showPins"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-conn-microusb",
+        "previewHint": "Click in Preview Mode to toggle retention tab styles (1=THT Lugs, 2=SMT Tabs)",
+        "changed": true,
+        "mutatedKeys": [
+          "tabStyle"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-conn-terminal-block",
+        "previewHint": "Click in Preview Mode to step pole count (2 -> 3 -> 4 -> 6)",
+        "changed": true,
+        "mutatedKeys": [
+          "poles"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-conn-power-pads",
+        "previewHint": "Click in Preview Mode to toggle polarity indicators",
+        "changed": true,
+        "mutatedKeys": [
+          "showPolarity"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-feature-smd-pad",
+        "previewHint": "Click in Preview Mode to toggle solder mask expansion border",
+        "changed": true,
+        "mutatedKeys": [
+          "showMaskExpansion"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-feature-circular-pad",
+        "previewHint": "Click in Preview Mode to toggle solder mask expansion ring",
+        "changed": true,
+        "mutatedKeys": [
+          "showMaskExpansion"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-feature-th-pad",
+        "previewHint": "Click in Preview Mode to toggle between Circular and Octagonal annular ring",
+        "changed": true,
+        "mutatedKeys": [
+          "isOctagonal"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-feature-via",
+        "previewHint": "Click in Preview Mode to step via grid array (1x1 -> 2x2 -> 3x3 -> 4x4)",
+        "changed": true,
+        "mutatedKeys": [
+          "gridSize"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-feature-test-point",
+        "previewHint": "Click in Preview Mode to cycle test point styles (Circle -> Square -> Probe Hook Loop)",
+        "changed": true,
+        "mutatedKeys": [
+          "pointType"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-route-trace-straight",
+        "previewHint": "Click in Preview Mode to toggle terminal solder pads",
+        "changed": true,
+        "mutatedKeys": [
+          "terminalPads"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-route-trace-45",
+        "previewHint": "Click in Preview Mode to toggle terminal pads",
+        "changed": true,
+        "mutatedKeys": [
+          "terminalPads"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-route-bus",
+        "previewHint": "Click in Preview Mode to step track count (2 -> 4 -> 6 -> 8)",
+        "changed": true,
+        "mutatedKeys": [
+          "tracks"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-feature-fiducial",
+        "previewHint": "Click in Preview Mode to toggle outer copper ground ring",
+        "changed": true,
+        "mutatedKeys": [
+          "showGroundRing"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-feature-mounting-hole",
+        "previewHint": "Click in Preview Mode to step screw size: M2 -> M2.5 -> M3 -> M4",
+        "changed": true,
+        "mutatedKeys": [
+          "holeSize"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-outline-board",
+        "previewHint": "Click in Preview Mode to toggle 4-corner mounting holes on/off",
+        "changed": true,
+        "mutatedKeys": [
+          "showMountingHoles"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-outline-slot",
+        "previewHint": "Click in Preview Mode to toggle slot orientation (1=Horizontal <-> 2=Vertical)",
+        "changed": true,
+        "mutatedKeys": [
+          "orientation"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      },
+      {
+        "shapeId": "pcb-outline-mousebites",
+        "previewHint": "Click in Preview Mode to step hole count (3 -> 5 -> 7 -> 9)",
+        "changed": true,
+        "mutatedKeys": [
+          "holes"
+        ],
+        "reEvalOk": true,
+        "secondClickOk": true,
+        "isGenuine": true
+      }
+    ]
+  },
+  "logs": [
+    {
+      "section": "Section 1",
+      "test": "paramSchema includes tabStyle",
+      "pass": true,
+      "details": {
+        "paramSchema": [
+          "label",
+          "tabLengthRatio",
+          "tabStyle"
+        ]
+      }
+    },
+    {
+      "section": "Section 1",
+      "test": "tabStyle 1 (THT) subpath count is 14",
+      "pass": true,
+      "details": {
+        "subpathCount": 14,
+        "expected": 14
+      }
+    },
+    {
+      "section": "Section 1",
+      "test": "tabStyle 1 (THT) all nodes finite",
+      "pass": true,
+      "details": {}
+    },
+    {
+      "section": "Section 1",
+      "test": "tabStyle 2 (SMT) subpath count is 10",
+      "pass": true,
+      "details": {
+        "subpathCount": 10,
+        "expected": 10
+      }
+    },
+    {
+      "section": "Section 1",
+      "test": "tabStyle 2 (SMT) all nodes finite",
+      "pass": true,
+      "details": {}
+    },
+    {
+      "section": "Section 1",
+      "test": "Geometry Difference between tabStyle 1 and 2",
+      "pass": true,
+      "details": {
+        "thSubpaths": 14,
+        "thTotalNodes": 96,
+        "smtSubpaths": 10,
+        "smtTotalNodes": 80
+      }
+    },
+    {
+      "section": "Section 1",
+      "test": "onPreviewClick toggle: 1 -> 2",
+      "pass": true,
+      "details": {
+        "initial": 1,
+        "afterClick1": 2,
+        "changed": true
+      }
+    },
+    {
+      "section": "Section 1",
+      "test": "onPreviewClick toggle: 2 -> 1",
+      "pass": true,
+      "details": {
+        "afterClick2": 1,
+        "changed": true
+      }
+    },
+    {
+      "section": "Section 1",
+      "test": "onPreviewClick toggle: 1 -> 2 second cycle",
+      "pass": true,
+      "details": {
+        "afterClick3": 2,
+        "changed": true
+      }
+    },
+    {
+      "section": "Section 2",
+      "test": "paramSchema includes orientation",
+      "pass": true,
+      "details": {
+        "paramSchema": [
+          "label",
+          "slotWidth",
+          "orientation"
+        ]
+      }
+    },
+    {
+      "section": "Section 2",
+      "test": "orientation 1 (Horizontal) nodes finite",
+      "pass": true,
+      "details": {}
+    },
+    {
+      "section": "Section 2",
+      "test": "orientation 1 (Horizontal) aspect ratio > 1",
+      "pass": true,
+      "details": {
+        "bboxWidth": 192,
+        "bboxHeight": 12,
+        "aspectRatio": 16
+      }
+    },
+    {
+      "section": "Section 2",
+      "test": "orientation 2 (Vertical) nodes finite",
+      "pass": true,
+      "details": {}
+    },
+    {
+      "section": "Section 2",
+      "test": "orientation 2 (Vertical) aspect ratio < 1",
+      "pass": true,
+      "details": {
+        "bboxWidth": 12,
+        "bboxHeight": 142,
+        "aspectRatio": 0.08450704225352113
+      }
+    },
+    {
+      "section": "Section 2",
+      "test": "orientation 1 width handle drag mutation",
+      "pass": true,
+      "details": {
+        "initial": 12,
+        "dragNarrow": 6,
+        "dragWide": 30,
+        "cpCursor": "ns-resize"
+      }
+    },
+    {
+      "section": "Section 2",
+      "test": "orientation 2 width handle drag mutation",
+      "pass": true,
+      "details": {
+        "initial": 12,
+        "dragNarrow": 6,
+        "dragWide": 30,
+        "cpCursor": "ew-resize"
+      }
+    },
+    {
+      "section": "Section 2",
+      "test": "onPreviewClick toggle: 1 -> 2",
+      "pass": true,
+      "details": {
+        "initial": 1,
+        "afterClick1": 2,
+        "changed": true
+      }
+    },
+    {
+      "section": "Section 2",
+      "test": "onPreviewClick toggle: 2 -> 1",
+      "pass": true,
+      "details": {
+        "afterClick2": 1,
+        "changed": true
+      }
+    },
+    {
+      "section": "Section 2",
+      "test": "onPreviewClick toggle: 1 -> 2 second cycle",
+      "pass": true,
+      "details": {
+        "afterClick3": 2,
+        "changed": true
+      }
+    },
+    {
+      "section": "Section 3",
+      "test": "Total Control Points Count is exactly 45",
+      "pass": true,
+      "details": {
+        "totalControlPoints": 45,
+        "expected": 45
+      }
+    },
+    {
+      "section": "Section 3",
+      "test": "Zero Dead Control Handles across all shapes (100% active)",
+      "pass": true,
+      "details": {
+        "deadHandlesCount": 0,
+        "deadHandles": [],
+        "activeHandlesCount": 45,
+        "percentage": "100.0%"
+      }
+    },
+    {
+      "section": "Section 4",
+      "test": "Total Interactive Shapes Count is 30 (100% of suite)",
+      "pass": true,
+      "details": {
+        "interactiveShapeCount": 30,
+        "totalShapes": 30
+      }
+    },
+    {
+      "section": "Section 4",
+      "test": "Zero No-Op Preview Facades across all shapes (100% active)",
+      "pass": true,
+      "details": {
+        "noopPreviewsCount": 0,
+        "noopPreviews": [],
+        "activePreviewCount": 30,
+        "percentage": "100.0%"
+      }
+    }
+  ]
+}

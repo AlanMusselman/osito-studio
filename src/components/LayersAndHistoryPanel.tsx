@@ -1575,6 +1575,7 @@ export const LayersAndHistoryPanel: React.FC<LayersAndHistoryPanelProps> = ({
       'Badges & Icons': 'Badges & Icons',
       'Flow & Diagrams': 'Sitemaps & Flow',
       'Drone Parts & Frames': 'Drone Parts',
+      'PCB Layout': 'PCB Layout',
       'Creative & Vector': 'Creative',
       'Custom JS': 'Custom JS',
       Basic: 'Basic',

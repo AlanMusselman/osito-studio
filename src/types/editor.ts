@@ -205,6 +205,7 @@ export type AutoShapeCategory =
   | 'Badges & Icons'
   | 'Flow & Diagrams'
   | 'Drone Parts & Frames'
+  | 'PCB Layout'
   | 'Creative & Vector'
   | 'Custom JS'
   | 'Basic'
@@ -218,6 +219,7 @@ export const AUTOSHAPE_GROUP_ORDER: AutoShapeCategory[] = [
   'Badges & Icons',
   'Flow & Diagrams',
   'Drone Parts & Frames',
+  'PCB Layout',
   'Creative & Vector',
   'Custom JS',
 ];

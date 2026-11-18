@@ -45,6 +45,7 @@ export interface CommandPaletteModalProps {
   onExportPng: () => void;
   onOpenCodeStudio: () => void;
   onResetStarterShowcase: () => void;
+  onLoadShowcasePreset?: (index: number) => void;
   canvasScoreSummary?: { score: number; grade: string; fixesCount: number };
 }
 
@@ -100,6 +101,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
   onExportPng,
   onOpenCodeStudio,
   onResetStarterShowcase,
+  onLoadShowcasePreset,
   canvasScoreSummary,
 }) => {
   const [query, setQuery] = useState('');
@@ -316,6 +318,22 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
         badgeTone: 'violet',
         onExecute: runAndClose(() => onGenerateWebsiteLayout('sitemap-architecture')),
       },
+      {
+        id: 'cmd-load-pcb-starter-scene',
+        category: 'Generate',
+        sectionTitle: 'Generate (100% Vector Layouts & Logos)',
+        label: 'Load CUB-FC405 Avionics PCB Layout Prototype',
+        subtitle:
+          '4-layer FR4 avionics PCB with STM32 QFP-48, QFN IMU, 0603 passives, and 45° copper traces',
+        keywords: 'pcb printed circuit board avionics flight controller stm32 imu traces starter template prototype cub-fc405 layout',
+        badge: 'PCB AVIONICS',
+        badgeTone: 'emerald',
+        onExecute: runAndClose(() => {
+          if (onLoadShowcasePreset) {
+            onLoadShowcasePreset(6);
+          }
+        }),
+      },
 
       // 3. Color Themes (1-Click Recolor)
       ...COLOR_THEME_PRESETS.map((theme): PaletteCommandItem => ({
@@ -510,6 +528,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
     onExportSvg,
     onExportPng,
     onResetStarterShowcase,
+    onLoadShowcasePreset,
   ]);
 
   // Dynamic Instant Deep Research actions when user types >= 2 characters
