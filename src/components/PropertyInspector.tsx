@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Sliders,
   Sparkles,
@@ -204,6 +204,8 @@ export const PropertyInspector: React.FC<PropertyInspectorProps> = ({
   const [panelTitle, setPanelTitle] = useState<string>('PROPERTIES INSPECTOR');
   const [isEditingTitle, setIsEditingTitle] = useState<boolean>(false);
   const [draftTitle, setDraftTitle] = useState<string>('PROPERTIES INSPECTOR');
+  const [isEditingObjectName, setIsEditingObjectName] = useState<boolean>(false);
+  const [draftObjectName, setDraftObjectName] = useState<string>('');
 
   const handleStartRename = () => {
     setDraftTitle(panelTitle);
@@ -224,6 +226,42 @@ export const PropertyInspector: React.FC<PropertyInspectorProps> = ({
     (selectedSliceId && slices?.find((s) => s.id === selectedSliceId)) ||
     (activeTool === 'slice' && slices && slices.length > 0 ? slices[0] : null) ||
     null;
+  const isSliceActive = Boolean(selectedSlice && (selectedSliceId || activeTool === 'slice'));
+  const canRenameActiveTarget = Boolean(primaryObj || isSliceActive);
+
+  useEffect(() => {
+    setIsEditingObjectName(false);
+  }, [primaryObj?.id, selectedSlice?.id]);
+
+  const handleStartObjectRename = () => {
+    if (isSliceActive && selectedSlice) {
+      setDraftObjectName(selectedSlice.name);
+      setIsEditingObjectName(true);
+      return;
+    }
+    if (primaryObj) {
+      setDraftObjectName(primaryObj.name);
+      setIsEditingObjectName(true);
+    }
+  };
+
+  const handleCommitObjectRename = () => {
+    const trimmed = draftObjectName.trim();
+    if (isSliceActive && selectedSlice) {
+      if (trimmed && trimmed !== selectedSlice.name) {
+        const normalized = trimmed.replace(/^#/, '').replace(/\s+/g, '-').toLowerCase();
+        onUpdateSlice?.(selectedSlice.id, { name: normalized });
+        onShowToast?.(`Renamed slice to "#${normalized}"`);
+      }
+      setIsEditingObjectName(false);
+      return;
+    }
+    if (primaryObj && trimmed && trimmed !== primaryObj.name) {
+      onUpdateObject(primaryObj.id, { name: trimmed }, true);
+      onShowToast?.(`Renamed object to "${trimmed}"`);
+    }
+    setIsEditingObjectName(false);
+  };
 
   // Determine badge title & pure monochrome greyscale styling
   let badgeTitle = 'CANVAS DOCUMENT';
@@ -252,22 +290,22 @@ export const PropertyInspector: React.FC<PropertyInspectorProps> = ({
     if (primaryObj.type === 'autoshape') {
       const def = autoShapes.find((s) => s.id === primaryObj.shapeDefId);
       badgeTitle = 'JS AUTOSHAPE';
-      badgeSubtitle = def?.name || primaryObj.name;
+      badgeSubtitle = primaryObj.name || def?.name || 'AutoShape';
       badgeAccent = 'border-[#888888] bg-[#1c1c1c] text-[#ffffff]';
       badgeDot = 'bg-[#ffffff] rotate-45';
     } else if (primaryObj.type === 'vector-path') {
-      badgeTitle = 'VECTOR PATH';
-      badgeSubtitle = `${primaryObj.nodes.length} Bezier Nodes`;
+      badgeTitle = `VECTOR PATH (${primaryObj.nodes.length} Nodes)`;
+      badgeSubtitle = primaryObj.name || 'Vector Path';
       badgeAccent = 'border-[#737373] bg-[#1c1c1c] text-[#ffffff]';
       badgeDot = 'bg-[#d4d4d4]';
     } else if (primaryObj.type === 'bitmap') {
-      badgeTitle = 'BITMAP OBJECT';
-      badgeSubtitle = `${primaryObj.pixelWidth} × ${primaryObj.pixelHeight} px Raster`;
+      badgeTitle = `BITMAP (${primaryObj.pixelWidth}×${primaryObj.pixelHeight}px)`;
+      badgeSubtitle = primaryObj.name || 'Bitmap Layer';
       badgeAccent = 'border-[#737373] bg-[#1c1c1c] text-[#ffffff]';
       badgeDot = 'bg-[#d4d4d4]';
     } else if (primaryObj.type === 'text') {
-      badgeTitle = 'TEXT OBJECT';
-      badgeSubtitle = `${primaryObj.fontFamily} (${primaryObj.fontSize}px)`;
+      badgeTitle = `TEXT OBJECT (${primaryObj.fontSize}px)`;
+      badgeSubtitle = primaryObj.name || 'Text Layer';
       badgeAccent = 'border-[#737373] bg-[#1c1c1c] text-[#ffffff]';
       badgeDot = 'bg-[#d4d4d4]';
     }
@@ -2917,11 +2955,50 @@ export const PropertyInspector: React.FC<PropertyInspectorProps> = ({
             </div>
           )}
         </div>
-        <div>
-          <div className="text-xs font-bold tracking-tight truncate">{badgeTitle}</div>
-          <div className="text-[10px] font-mono opacity-80 truncate">
-            {badgeSubtitle}
+        <div
+          onDoubleClick={canRenameActiveTarget ? handleStartObjectRename : undefined}
+          title={
+            canRenameActiveTarget
+              ? 'Double-click to rename active selected object'
+              : undefined
+          }
+          className={canRenameActiveTarget ? 'cursor-text group/objname min-w-0' : 'min-w-0'}
+        >
+          <div className="text-[10px] font-mono uppercase tracking-tight opacity-75 truncate">
+            {badgeTitle}
           </div>
+          {isEditingObjectName && canRenameActiveTarget ? (
+            <input
+              type="text"
+              value={draftObjectName}
+              autoFocus
+              onFocus={(e) => e.currentTarget.select()}
+              onChange={(e) => setDraftObjectName(e.target.value)}
+              onBlur={handleCommitObjectRename}
+              onKeyDown={(e) => {
+                e.stopPropagation();
+                if (e.key === 'Enter') handleCommitObjectRename();
+                if (e.key === 'Escape') setIsEditingObjectName(false);
+              }}
+              className="w-full mt-0.5 bg-[#0a0a0a] border border-[#ffffff] px-1.5 py-0.5 text-xs font-mono font-bold text-[#ffffff] rounded-none outline-none"
+            />
+          ) : (
+            <div className="flex items-center justify-between gap-1 mt-0.5 min-w-0">
+              <div className="text-xs font-bold tracking-tight text-[#ffffff] truncate group-hover/objname:underline">
+                {badgeSubtitle}
+              </div>
+              {canRenameActiveTarget && (
+                <button
+                  type="button"
+                  onClick={handleStartObjectRename}
+                  title="Rename Selected Object (or double-click name)"
+                  className="opacity-50 group-hover/objname:opacity-100 text-[#a3a3a3] hover:text-[#ffffff] p-0.5 rounded-none shrink-0"
+                >
+                  <Pencil className="w-2.5 h-2.5" />
+                </button>
+              )}
+            </div>
+          )}
         </div>
         <div className="text-[9px] font-mono opacity-65 flex items-center justify-between pt-1 border-t border-[#2e2e2e]">
           <span>OSITO ENGINE</span>
