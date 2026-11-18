@@ -264,7 +264,46 @@ export const LeftToolDock: React.FC<LeftToolDockProps> = ({
   const [flyoutGroup, setFlyoutGroup] = useState<'All' | AutoShapeCategory>('All');
   const [flyoutSearch, setFlyoutSearch] = useState('');
   const [activeSwatch, setActiveSwatch] = useState<'primary' | 'secondary'>('primary');
+  const [toolColumns, setToolColumns] = useState<2 | 3 | 4>(2);
+  const [isResizingDock, setIsResizingDock] = useState(false);
   const flyoutRef = useRef<HTMLDivElement>(null);
+  const dockRef = useRef<HTMLElement>(null);
+
+  // Width in px for 2, 3, or 4 tool icons across (each tool icon is 32px wide + 4px gap + 12px horizontal padding)
+  const dockWidthPx = toolColumns === 2 ? 78 : toolColumns === 3 ? 114 : 150;
+  const gridColsClass =
+    toolColumns === 2
+      ? 'grid-cols-2'
+      : toolColumns === 3
+      ? 'grid-cols-3'
+      : 'grid-cols-4';
+
+  const handleStartDockResize = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const dockLeft = dockRef.current?.getBoundingClientRect().left ?? 0;
+    setIsResizingDock(true);
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const targetWidth = moveEvent.clientX - dockLeft;
+      if (targetWidth < 96) {
+        setToolColumns(2);
+      } else if (targetWidth < 132) {
+        setToolColumns(3);
+      } else {
+        setToolColumns(4);
+      }
+    };
+
+    const onMouseUp = () => {
+      setIsResizingDock(false);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
 
   const activeAutoShape =
     autoShapes.find((s) => s.id === toolOptions.activeAutoShapeId) || autoShapes[0];
@@ -329,17 +368,75 @@ export const LeftToolDock: React.FC<LeftToolDockProps> = ({
 
   return (
     <aside
-      className={`w-[76px] bg-[#111111] border-r border-[#2e2e2e] flex flex-col justify-between py-2 px-1.5 select-none shrink-0 rounded-none ${
+      ref={dockRef}
+      style={{ width: `${dockWidthPx}px` }}
+      className={`relative bg-[#111111] border-r border-[#2e2e2e] flex flex-col justify-between py-2 px-1.5 select-none shrink-0 rounded-none transition-[width] duration-75 ${
         flyoutOpen ? 'z-40' : 'z-20'
       }`}
     >
-      <div className="flex flex-col gap-2.5">
+      {/* Interactive Right-Edge Drag Sash to Scale Toolbar Left or Right (2 to 4 Tool Icons Across) */}
+      <div
+        onMouseDown={handleStartDockResize}
+        title="Drag left or right to scale Toolbar between 2, 3, or 4 tool icons across (double-click to cycle)"
+        onDoubleClick={() =>
+          setToolColumns((prev) => (prev === 2 ? 3 : prev === 3 ? 4 : 2))
+        }
+        className={`absolute top-0 -right-1 w-2 h-full cursor-col-resize z-50 flex items-center justify-center group ${
+          isResizingDock ? 'bg-[#38bdf8]/40' : 'hover:bg-[#ffffff]/20'
+        }`}
+      >
+        <div
+          className={`w-[2px] h-10 transition-colors ${
+            isResizingDock
+              ? 'bg-[#38bdf8]'
+              : 'bg-transparent group-hover:bg-[#d4d4d4]'
+          }`}
+        />
+      </div>
+
+      <div className="flex flex-col gap-2 overflow-y-auto overflow-x-hidden pr-0.5">
+        {/* TOOLBAR COLUMN WIDTH SCALER BAR (2 / 3 / 4 Icons Across) */}
+        <div className="flex items-center justify-between pb-1.5 border-b border-[#242424] px-0.5">
+          <button
+            type="button"
+            disabled={toolColumns <= 2}
+            onClick={() =>
+              setToolColumns((prev) => (prev === 4 ? 3 : 2))
+            }
+            title="Narrow toolbar (-1 icon column)"
+            className="px-1 py-0.5 text-[9px] font-mono bg-[#181818] hover:bg-[#262626] disabled:opacity-30 text-[#d4d4d4] border border-[#2e2e2e]"
+          >
+            ◀
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              setToolColumns((prev) => (prev === 2 ? 3 : prev === 3 ? 4 : 2))
+            }
+            title="Click to cycle 2, 3, or 4 tool icons across (or drag the right edge of this toolbar)"
+            className="px-1 py-0.5 text-[9px] font-mono text-[#a3a3a3] hover:text-[#ffffff] tracking-tight"
+          >
+            {toolColumns}×Cols
+          </button>
+          <button
+            type="button"
+            disabled={toolColumns >= 4}
+            onClick={() =>
+              setToolColumns((prev) => (prev === 2 ? 3 : 4))
+            }
+            title="Widen toolbar (+1 icon column, up to 4 across)"
+            className="px-1 py-0.5 text-[9px] font-mono bg-[#181818] hover:bg-[#262626] disabled:opacity-30 text-[#d4d4d4] border border-[#2e2e2e]"
+          >
+            ▶
+          </button>
+        </div>
+
         {/* SELECT SECTION */}
         <div>
           <div className="text-[9px] font-mono uppercase tracking-wider text-[#a3a3a3] px-0.5 mb-1 flex items-center justify-between">
             <span>Select</span>
           </div>
-          <div className="grid grid-cols-2 gap-1">
+          <div className={`grid ${gridColsClass} gap-1 justify-items-center`}>
             {SELECT_TOOLS.map(renderToolButton)}
           </div>
         </div>
@@ -349,7 +446,7 @@ export const LeftToolDock: React.FC<LeftToolDockProps> = ({
           <div className="text-[9px] font-mono uppercase tracking-wider text-[#a3a3a3] px-0.5 mb-1 flex items-center justify-between">
             <span>Bitmap</span>
           </div>
-          <div className="grid grid-cols-2 gap-1">
+          <div className={`grid ${gridColsClass} gap-1 justify-items-center`}>
             {BITMAP_TOOLS.map(renderToolButton)}
           </div>
         </div>
@@ -359,7 +456,7 @@ export const LeftToolDock: React.FC<LeftToolDockProps> = ({
           <div className="text-[9px] font-mono uppercase tracking-wider text-[#a3a3a3] px-0.5 mb-1 flex items-center justify-between">
             <span>Vector</span>
           </div>
-          <div className="grid grid-cols-2 gap-1">
+          <div className={`grid ${gridColsClass} gap-1 justify-items-center`}>
             {VECTOR_TOOLS.map(renderToolButton)}
 
             {/* JS AUTOSHAPE FLYOUT TRIGGER */}
@@ -389,7 +486,10 @@ export const LeftToolDock: React.FC<LeftToolDockProps> = ({
 
           {/* JS AUTOSHAPES FLYOUT MENU */}
           {flyoutOpen && (
-            <div className="fixed left-[76px] top-[52px] max-h-[calc(100vh-148px)] w-80 bg-[#111111] border border-[#383838] rounded-none shadow-2xl p-2.5 z-50 flex flex-col">
+            <div
+              style={{ left: `${dockWidthPx}px` }}
+              className="fixed top-[52px] max-h-[calc(100vh-148px)] w-80 bg-[#111111] border border-[#383838] rounded-none shadow-2xl p-2.5 z-50 flex flex-col"
+            >
               <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#242424]">
                 <div className="flex items-center gap-1.5">
                   <span className="text-xs font-semibold text-[#f5f5f5]">
@@ -540,7 +640,7 @@ export const LeftToolDock: React.FC<LeftToolDockProps> = ({
           <div className="text-[9px] font-mono uppercase tracking-wider text-[#a3a3a3] px-0.5 mb-1 flex items-center justify-between">
             <span>Web</span>
           </div>
-          <div className="grid grid-cols-2 gap-1">
+          <div className={`grid ${gridColsClass} gap-1 justify-items-center`}>
             {WEB_TOOLS.map(renderToolButton)}
             <button
               type="button"
@@ -569,7 +669,7 @@ export const LeftToolDock: React.FC<LeftToolDockProps> = ({
           <div className="text-[9px] font-mono uppercase tracking-wider text-[#a3a3a3] px-0.5 mb-1">
             View
           </div>
-          <div className="grid grid-cols-2 gap-1">
+          <div className={`grid ${gridColsClass} gap-1 justify-items-center`}>
             {VIEW_TOOLS.map(renderToolButton)}
           </div>
         </div>
